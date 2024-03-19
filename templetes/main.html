@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script>
+      function check(response) {
+        alert(response["token"]);
+      }
+      function checkClick() {
+        // $.ajax({
+        //   type:"POST",
+        //   url:"/login",
+        // })
+      }
+    </script>
+  </head>
+  <body>
+    <p>메인 페이지</p>
+    <button class="button is-info is-light" onclick="checkClick()">확인</button>
+  </body>
+</html>
