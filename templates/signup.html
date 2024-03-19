@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--Bulma-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <!--구글폰트-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap"
+      rel="stylesheet"
+    />
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"
+    ></script>
+    <title>회원가입</title>
+    <style>
+      #stuff {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 500px;
+        margin: auto;
+      }
+      .top {
+        background-color: white;
+        font-family: "Gamja Flower", cursive;
+      }
+      .top .title {
+        font-size: 60px;
+        text-align: center;
+      }
+      .main {
+        padding: 50px 150px;
+      }
+      .main .tfield {
+        width: 500px;
+        margin: auto;
+        padding: 10px 0px;
+      }
+      .main .main02 {
+        padding: 20px;
+      }
+      .bottom {
+        padding: 20px 10px;
+      }
+      .bottom .control {
+        padding: 10px;
+      }
+    </style>
+    <script>
+      function checkID() {
+        let id = $("#id").val();
+        $.ajax({
+          type: "POST",
+          url: "/sign/check",
+          data: { id_give: id },
+          success: function (response) {
+            if (response["result"] == "success") {
+              alert("사용가능합니다!");
+            } else {
+              alert(response["msg"]);
+            }
+          },
+        });
+      }
+      function postData() {
+        let name = $("#name").val();
+        let id = $("#id").val();
+        let pw = $("#pw").val();
+        let room = $("#room").val();
+
+        $.ajax({
+          type: "POST",
+          url: "/sign",
+          data: {
+            id_give: id,
+            name_give: name,
+            pw_give: pw,
+            room_give: room,
+          },
+          success: function (response) {
+            if (response["result"] == "success") {
+              alert("모두의 냉장고의 회원이 되셨습니다.");
+              window.location.href = "/";
+            } else {
+              alert(response["msg"]);
+            }
+          },
+        });
+      }
+      function cancel() {
+        window.location.href = "/";
+      }
+    </script>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <section class="hero is-info">
+          <div class="hero-body">
+            <p class="title">모두의 냉장고</p>
+          </div>
+        </section>
+      </div>
+      <div class="main">
+        <div class="main01">
+          <div class="tfield">
+            <label class="label">이름</label>
+            <div class="control">
+              <input id="name" class="input" type="text" placeholder="이름" />
+            </div>
+          </div>
+          <div class="tfield">
+            <label class="label">ID</label>
+            <div class="control">
+              <input id="id" class="input" type="text" placeholder="ID" />
+            </div>
+          </div>
+          <div class="tfield">
+            <label class="label">PW</label>
+            <div class="control">
+              <input
+                id="pw"
+                class="input"
+                type="password"
+                placeholder="PASSWORD"
+              />
+            </div>
+          </div>
+          <div class="tfield">
+            <label class="label">호수</label>
+            <div class="control">
+              <input id="room" class="input" type="number" placeholder="호수" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <div class="field is-grouped" style="justify-content: center">
+            <div class="control">
+              <button class="button is-info" onclick="postData()">가 입</button>
+            </div>
+            <div class="control">
+              <button class="button is-info is-light" onclick="cancel()">
+                취 소
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -65,6 +65,9 @@ a, a:hover, a:focus {
     color: #fff;
     transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
     transform-origin: bottom left;
+    height: auto;
+    overflow-y: auto;    /* 세로 스크롤 가능 */
+    border-radius: 10px;
 }
 
 #sidebar.active {

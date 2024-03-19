@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 
     <!-- Our Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
@@ -52,7 +52,17 @@
             });
         });
 
-     </script>
+    </script>
+    <script>
+        function changeFloorText(element) {
+            // 클릭된 요소에서 data-floor 속성 값 가져오기
+            var floor = element.getAttribute('data-floor');
+            // 현재 층을 나타내는 버튼의 텍스트 업데이트
+            document.querySelector('.btn.btn-outline-primary').textContent = floor + '층';
+        }
+        document.getElementById('current-floor-btn').textContent = floor + '층';
+    </script>
+
 
 
 
@@ -71,34 +81,13 @@
             </div>
     
             <ul class="list-unstyled components">
-                <p>
-                    층별 선택
-                </p>
-                
-                <li>
-                    <a href="#">1층</a>
-                </li>
-                <li>
-                    <a href="#">2층</a>
-                </li>
-                <li>
-                    <a href="#">3층</a>
-                </li>
-                <li>
-                    <a href="#">4층</a>
-                </li>
-                <li>
-                    <a href="#">5층</a>
-                </li>
-                <li>
-                    <a href="#">6층</a>
-                </li>
-                <li>
-                    <a href="#">7층</a>
-                </li>
-                <li>
-                    <a href="#">8층</a>
-                </li>
+                <p>층별 선택</p>
+                <div>
+                    {% for floor in floors %}
+                    <li><a href="#" data-floor="{{ floor }}" onclick="changeFloorText(this);">{{ floor }}층</a></li>
+                    {% endfor %}                  
+                </div>
+
             </ul>
         </nav>
 
@@ -112,27 +101,23 @@
                         <span></span>
                     </button>
 
-                    <button type="button" class="btn btn-outline-primary">모두의 냉장고</button>
+                    <p>모두의 냉장고</p>
 
-                    <button type="button" class="btn btn-outline-primary">10층</button>
+                    <button type="button" class="btn btn-outline-primary" id="current-floor-btn">{{ roomnumber }}층</button>
 
-
-                    <!--<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="fas fa-align-justify"></i>
-                    </button> -->
 
                    
                 </div>
             </nav>
 
             <div class ="wrap-main">
-                <div class = "user-contents">
+                <div class = "user-contents" >
                     <div class="circle-box" style="background: #BDBDBD;">
                         <img class="profile" src="https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800">
                     </div>
-                    <h4> 안녕하세요 OOO님!</h4>
-                    <h3> 104호 </h3>
-                    <P> 등록한 음식: 0개 </P>
+                    <h4> 안녕하세요 {{user_info.name_give}}님!</h4>
+                    <h3> {{user_info.room}}호 </h3>
+                    <p> 등록한 음식: 0개 </p>
  
                     <button type="button" class="btn btn-outline-primary" id = "myfridge">마이냉장고</button>
                     <a class="btn btn-primary btn-lg" href="#" role="button" id="btn-posting-box"> 등록하기 </a>
@@ -180,7 +165,7 @@
                                     <div class="box" style= "background-color: rgb(211, 246, 255);">
                                         메모메모
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription">신청하기</button>
+                                    <button type="button" class="btn btn-outline-primary" id = "subscription1">신청하기</button>
                                 </div>
                             </div>
                             <div class="card">
@@ -198,7 +183,7 @@
                                     <div class="box" style= "background-color: rgb(211, 246, 255);">
                                         메모메모
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription">신청하기</button>
+                                    <button type="button" class="btn btn-outline-primary" id = "subscription2">신청하기</button>
                                 </div>
                             </div>
                             <div class="card">
@@ -216,7 +201,7 @@
                                     <div class="box" style= "background-color: rgb(211, 246, 255);">
                                         메모메모
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription">신청하기</button>
+                                    <button type="button" class="btn btn-outline-primary" id = "subscription3">신청하기</button>
                                 </div>
                             </div>
                             <div class="card">
@@ -234,7 +219,7 @@
                                     <div class="box" style= "background-color: rgb(211, 246, 255);">
                                         메모메모
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription">신청하기</button>
+                                    <button type="button" class="btn btn-outline-primary" id = "subscription4">신청하기</button>
                                 </div>
                             </div>
                             <div class="card">
@@ -252,13 +237,13 @@
                                     <div class="box" style= "background-color: rgb(211, 246, 255);">
                                         메모메모
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription">신청하기</button>
+                                    <button type="button" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
                                 </div>
                             </div>
                             
                         </div>
-                    <p> 
-                    </div>
+                    </p> 
+                </div>   
                 </div>
         </div>
     </div>

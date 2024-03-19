@@ -1,3 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--Bulma-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <!--구글폰트-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap"
+      rel="stylesheet"
+    />
 
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <title>로그인</title>
+  </head>
 
+  <style>
+    .top {
+      font-family: "Gamja Flower", cursive;
+    }
 
+    .top .title {
+      font-size: 60px;
+      text-align: center;
+    }
+    .main001 {
+      padding: 60px 150px 0px;
+      margin: 30px 0px;
+    }
+
+    .bottom {
+      padding: 20px 10px;
+    }
+    .bottom .control001 {
+      padding: 10px;
+      text-align: center;
+    }
+    .inbox {
+      width: 350px;
+      margin: auto;
+      padding: 10px 0px;
+    }
+  </style>
+  <script>
+    function login() {
+      $.ajax({
+        type: "POST",
+        url: "/",
+        data: {
+          id_give: $("#inputID").val(),
+          pw_give: $("#inputPW").val(),
+        },
+        success: function (response) {
+          console.log(response);
+          if (response["result"] == "success") {
+            $.cookie("mytoken", response["token"]);
+            alert("로그인 되었습니다!");
+            window.location.href = "/index";
+          } else {
+            alert(response["msg"]);
+          }
+        },
+      });
+    }
+
+    function sign() {
+      window.location.href = "/sign";
+    }
+  </script>
+
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <section class="hero is-info">
+          <div class="hero-body">
+            <p class="title">모두의 냉장고</p>
+          </div>
+        </section>
+      </div>
+      <div class="wrap">
+        <!-- 플래시 메시지 표시 -->
+        {% with messages = get_flashed_messages() %} {% if messages %} {% for
+        message in messages %}
+        <div class="notification is-info">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+      </div>
+      <div class="main001">
+        <div class="inbox">
+          <label class="label">ID</label>
+          <div class="control">
+            <input class="input" id="inputID" type="" placeholder="ID" />
+          </div>
+        </div>
+
+        <div class="inbox">
+          <label class="label">Password</label>
+          <div class="control">
+            <input
+              class="input"
+              id="inputPW"
+              type="password"
+              placeholder="********"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="bottom">
+        <p class="control001">
+          <button onclick="login()" class="button is-info">로그인</button>
+          <button onclick="sign()" class="button is-info is-outlined">
+            회원가입
+          </button>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
