@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+            integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery and Bootstrap Bundle (includes Popper) -->
+        <script
+            src="https://code.jquery.com/jquery-3.6.0.js"
+            type="text/javascript"></script>
+
+        <!-- 아래 코드 파일 실행 시, ajax 실행 안됨. -->
+        <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>-->
+
+        <!-- ajax 실행 됨. -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+            crossorigin="anonymous"></script>
+
+        <title>마이 페이보릿 무비 만들기</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+
+        <!-- <link rel="stylesheet" href = "{{ url_for('static', filename ='css/movie_style.css') }}"> -->
+
+
+        <style>
+            * {
+                font-family: 'IBM Plex Sans KR', sans-serif;
+            }
+
+            .wrap {
+                width: 1000px;
+                margin: 10px auto;
+            }
+
+            .content{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #cards-box {
+                display: block;
+            }
+
+            .title {
+                text-align: center;
+                padding: 40px;
+                background-color: rgb(255, 207, 49);
+            }
+
+            .title > h1 {
+                font-weight: bold;
+            }
+
+            .card-title {
+                font-weight: bold;
+            }
+
+            .col-md-5 {
+                
+                margin: 50px auto 50px auto;
+            }
+
+            .top-btn-group {
+                width: auto;
+                margin: 20px auto 20px auto;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .detail-btn-group{
+                display: flex;
+                flex-direction: row;
+            }
+
+            .view-trash{
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 10px;
+            }
+
+            #cards-box {
+                justify-content: center;
+            }
+
+            a {
+                display: inline-block;
+                color: inherit;
+                color: black;
+                font-weight: bold;
+            }
+
+            #movie-title:hover {
+                text-decoration: underline;
+            }
+
+            #thumbs_up {
+                background-color: none;
+                color: blue;
+            }
+
+            #goto_trashcan {
+                color: red;
+            }
+
+            #btn-trashcan {
+                color: rgb(93, 188, 125);
+                background : none;
+                border: none;
+            }
+
+        </style>
+
+        <script>
+
+            const Sort = {
+                BY_LIKES: "likes",
+                BY_VIEWERS: "viewers",
+                BY_DATE: "open_date",
+            };
+
+            let sortMode = Sort.BY_LIKES
+            let trashMode = false
+
+            $(document).ready(function () {
+                // 영화 목록을 보여줍니다.
+                displaySorter()
+
+                showMovies()
+
+
+            });
+
+            function showMovies() {
+                $('#cards-box').empty()
+
+                if (trashMode == false) {
+                    $.ajax({
+                        type: "GET",
+                        url: "/movies/list",
+                        data: {'sortMode': sortMode},
+                        success: function(response){
+                            let movies = response["movies_list"];
+                            for(let i = 0; i < movies.length; i++)
+                            {
+                                console.log(movies[i]);
+                                makeCard(movies[i]["title"],movies[i]["open_date"],movies[i]["viewers"],movies[i]["info_url"],movies[i]["poster_url"],movies[i]["likes"])
+                            }
+                        }
+                    })
+
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "/movies/trashedlist",
+                        data: {'sortMode': sortMode},
+                        success: function(response){
+                            let movies = response["movies_list"];
+                            for(let i = 0; i < movies.length; i++)
+                            {
+                                console.log(movies[i]);
+                                makeTrashedCard(movies[i]["title"],movies[i]["open_date"],movies[i]["viewers"],movies[i]["info_url"],movies[i]["poster_url"],movies[i]["likes"])
+                            }
+                        }
+                    })
+
+                }
+            }
+
+            function makeCard(title, open_date, viewers, info_url, poster_url, likes) {
+                let formattedViewers = viewers.toLocaleString();
+                let temp_html = `<div class="card mb-3" style="max-width: 540px;">
+                                    <div class="row no-gutters">
+                                        <div class="col-md-5">
+                                            <img src="${poster_url}" alt="Card image cap">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="card-body">
+                                                <h5> <a href = "${info_url}" class="card-title" id= "movie_title" > ${title} </a></h5>
+                                                <span class="icon"><i class="fas fa-thumbs-up"></i></span><span class="movie-likes"> 👍 ${likes}</span>
+                                                <p class="viewers"> 누적관객수 ${formattedViewers}명 </p>
+                                                <p class="open_date">개봉일 ${open_date} </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-navy navbar-btn find-btn1" id="thumbs_up" onclick="likeMovie('${title}')" > 👍 위로! </button>
+                                        <button type="button"  class="btn btn-navy navbar-btn find-btn1"  id="goto_trashcan"onclick="trashMovie('${title}')"  >  🗑 휴지통으로! </button>
+                                    </div>
+                                </div>`;
+                                
+                $('#cards-box').append(temp_html);
+            }   
+
+            function makeTrashedCard(title, open_date, viewers, info_url,  poster_url, likes) {
+                let formattedViewers = viewers.toLocaleString();
+                let temp_html = `<div class="card mb-3" style="max-width: 540px;">
+                                    <div class="row no-gutters">
+                                        <div class="col-md-5">
+                                            <img src="${poster_url}" alt="Card image cap">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="card-body">
+                                                <h5 href = "${info_url}" class="card-title" id= "movie_title" > ${title} </h5>
+                                                <span class="icon"><i class="fas fa-thumbs-up"></i></span><span class="movie-likes"> 👍 ${likes}</span>
+                                                <p class="viewers"> 누적관객수 ${formattedViewers}명 </p>
+                                                <p class="open_date">개봉일 ${open_date} </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-navy navbar-btn find-btn1" onclick="trashMovie('${title}')" > 복구하기 </button>
+                                        <button type="button" class="btn btn-grey navbar-btn find-btn1" onclick="DeleteMovie('${title}')"  > 영구삭제 </button>
+                                    </div>
+                                </div>`;
+                                
+                $('#cards-box').append(temp_html);
+            }   
+
+            function changeSorter(newMode) {
+                if (sortMode == newMode) {
+                    return
+                }
+
+                sortMode = newMode
+                displaySorter()
+                showMovies()
+            }
+
+            // 정렬 기준에 따라 해당 버튼만 활성화 시키고 다른 버튼은 비활성화 시킴
+            function displaySorter() {
+                document.getElementById("sorter-likes").classList.remove("active")
+                document.getElementById("sorter-viewers").classList.remove("active")
+                document.getElementById("sorter-date").classList.remove("active")
+            }
+
+
+            function likeMovie(title) {
+                $.ajax({
+                    type: "POST",
+                    url: "/movies/like",
+                    data: {like_movie_give: title},
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            // 2. '좋아요 완료!' 얼럿을 띄웁니다.
+                            alert('좋아요 완료!')
+                            // 3. 변경된 정보를 반영하기 위해 새로고침합니다.
+                            showMovies()
+                        } else {
+                            alert('좋아요 실패ㅠㅠ')
+                        }
+                    }
+                });
+            }
+
+            function trashMovie(title) {
+                $.ajax({
+                    type: "POST",
+                    url: "/movies/trash",
+                    data: {trash_give: title},
+                    success: function (response) {
+                        if (response['result'] == 'success' ) {
+                            if(response['trashed'] == true )
+                                alert('휴지통 보내기 완료!')
+                            else
+                                alert('휴지통 복구 완료!')
+                            // 3. 변경된 정보를 반영하기 위해 새로고침합니다.
+                            showMovies()
+                        } else {
+                            alert('실패ㅠㅠ')
+                        }
+                    }
+                });
+            }
+
+            function displayTrashList()
+            {
+                if(trashMode == false) {
+                    trashMode = true
+                    //trashed가 true 인것들만 보여줌 
+                    showMovies()
+                    $('#btn-trashcan').text('🗑 휴지통 닫기')
+                }
+                else  //status = 'none'
+                {
+                    trashMode = false
+                     //trashed가 false 인것들만 보여줌 
+                    showMovies()
+                    $('#btn-trashcan').text('🗑  휴지통 보기')
+                }
+            }
+
+            function DeleteMovie(title) {
+                $.ajax({
+                    type: "POST",
+                    url: "/movies/delete",
+                    data: {delete_give: title},
+                    success: function (response) {
+                        if (response['result'] == 'success' ) {
+                            alert('영구 삭제 완료!')
+                            showMovies()
+                        } else {
+                            alert('실패ㅠㅠ')
+                        }
+                    }
+                });
+            }
+
+        </script>
+    </head>
+     
+    <body>
+        <div class ="wrap">
+            <div class="title">
+                <h1> 모두의 냉장고 </h1>
+            </div>
+            <div class = "content">
+                <div class="top-btn-group" role="group" aria-label="sorting">
+                    <div class = "detail-btn-group">
+                        <button type="button" class="btn btn-primary" id="sorter-date" > 최신순 </button>
+                        <button type="button" class="btn btn-primary"  id="sorter-expiration " > 유통기한 낮은 순  </button>
+                        <button type="button" class="btn btn-primary"  id="sorter-count" > 개수 적은 순 </button>
+                    </div>
+                    <div class="view-trash">
+                        <button id="btn-trashcan"  onclick="displayTrashList()">  🗑 휴지통 보기 </button>
+                    </div>
+                </div>
+                <!-- <p>
+                    <button class="view-trash" id="btn-trashcan"  onclick="displayTrashList()"> 휴지통 보기 </button>
+                </p> -->
+                <div id="cards-box" >
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
