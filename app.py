@@ -13,9 +13,9 @@ db = client.dbjungle
 ## route('/') 등의 주소가 같으면 안됨.
 
 
-def home():
-    return render_template('alonememo.html')
-
+@app.route('/main')
+def main():
+    return render_template('index.html')
 
 
 if __name__ == '__main__':

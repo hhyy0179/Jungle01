@@ -1,0 +1,22 @@
+{
+  "name": "jungle01",
+  "version": "1.0.0",
+  "description": "<h3>    나누고 싶은 음식을 등록할 수 있고,",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hhyy0179/Jungle01.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hhyy0179/Jungle01/issues"
+  },
+  "homepage": "https://github.com/hhyy0179/Jungle01#readme",
+  "dependencies": {
+    "bulma": "^0.9.4"
+  }
+}
