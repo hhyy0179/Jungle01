@@ -140,7 +140,7 @@
               모두의 냉장고
             </button>
 
-            <button type="button" class="btn btn-outline-primary">10층</button>
+            <button type="button" class="btn btn-outline-primary">층</button>
 
             <!--<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fas fa-align-justify"></i>
@@ -156,9 +156,9 @@
                 src="https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800"
               />
             </div>
-            <h4>안녕하세요 OOO님!</h4>
-            <h3>104호</h3>
-            <p>등록한 음식: 0개</p>
+            <h4>안녕하세요 {{user_info['name_give']}}!</h4>
+            <h3>{{user_info['room']}}호</h3>
+            <p>등록한 음식: {{food_count}}개</p>
 
             <button type="button" class="btn btn-outline-primary" id="myfridge">
               마이냉장고

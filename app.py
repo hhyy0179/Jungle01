@@ -19,6 +19,7 @@ def home():
     return render_template("login.html")
 
 
+# 로그인
 @app.route("/sign")
 def login():
     return render_template("signup.html")
@@ -31,6 +32,7 @@ def join():
     name_recieve = request.form["name_give"]
     pw_recieve = request.form["pw_give"]
     room_recieve = request.form["room_give"]
+    count_recieve = request.form["count_give"]
 
     result = db.users.find_one({"id": id_recieve})
 
@@ -51,6 +53,7 @@ def join():
                 "pw": pw_recieve,
                 "name_give": name_recieve,
                 "room": room_recieve,
+                "count": count_recieve,
             }
         )
         return jsonify({"result": "success"})
@@ -88,7 +91,8 @@ def find():
         )  # token디코딩합니다.
         userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
         print(userinfo)
-        return render_template("index.html", user_info=userinfo)
+        food_count = len(list(db.refrigerator.find({"user_id": userinfo["id"]})))
+        return render_template("index.html", user_info=userinfo, food_count=food_count)
 
     except jwt.ExpiredSignatureError:
         flash("로그인 시간이 만료되었습니다.")
