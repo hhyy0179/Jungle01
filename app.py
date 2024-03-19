@@ -3,7 +3,14 @@ import jwt
 import hashlib
 from datetime import datetime, timezone, timedelta
 
+from flask import Flask, flash, render_template, jsonify, request, redirect, url_for
+import jwt
+import hashlib
+from datetime import datetime, timezone, timedelta
+
 app = Flask(__name__)
+SECRET_KEY = "REDSEVEN"
+app.secret_key = "your_very_secret_and_complex_key_here"
 SECRET_KEY = "REDSEVEN"
 app.secret_key = "your_very_secret_and_complex_key_here"
 
