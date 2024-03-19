@@ -63,13 +63,14 @@
           if (response["result"] == "success") {
             $.cookie("mytoken", response["token"]);
             alert("로그인 되었습니다!");
-            window.location.href = "/main";
+            window.location.href = "/index";
           } else {
             alert(response["msg"]);
           }
         },
       });
     }
+
     function sign() {
       window.location.href = "/sign";
     }

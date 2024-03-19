@@ -3,14 +3,21 @@ import jwt
 import hashlib
 from datetime import datetime, timezone, timedelta
 
+from flask import Flask, flash, render_template, jsonify, request, redirect, url_for
+import jwt
+import hashlib
+from datetime import datetime, timezone, timedelta
+
 app = Flask(__name__)
+SECRET_KEY = "REDSEVEN"
+app.secret_key = "your_very_secret_and_complex_key_here"
 SECRET_KEY = "REDSEVEN"
 app.secret_key = "your_very_secret_and_complex_key_here"
 
 from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
-db = client.dbrefrigerator
+db = client.dbweek0test
 
 
 ## HTML을 주는 부분
@@ -81,7 +88,7 @@ def api_login():
         return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 틀렸습니다."})
 
 
-@app.route("/main")  # 메인 페이지
+@app.route("/index")  # 메인 페이지
 def find():
     token_receive = request.cookies.get("mytoken")
 
@@ -91,8 +98,12 @@ def find():
         )  # token디코딩합니다.
         userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
         print(userinfo)
-        food_count = len(list(db.refrigerator.find({"user_id": userinfo["id"]})))
-        return render_template("index.html", user_info=userinfo, food_count=food_count)
+        floors = [i for i in range(1, 23)]
+        roomnumber = int(userinfo.get("room", "1")) // 100
+        print(roomnumber)
+        return render_template(
+            "index.html", user_info=userinfo, floors=floors, roomnumber=roomnumber
+        )
 
     except jwt.ExpiredSignatureError:
         flash("로그인 시간이 만료되었습니다.")
