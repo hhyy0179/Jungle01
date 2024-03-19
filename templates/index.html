@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>모두의 냉장고</title>
+
+    <!-- Bootstrap CSS CDN -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+      integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+      crossorigin="anonymous"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+
+    <!-- Bulma CSS  -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+
+    <!-- Our Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Font Awesome JS -->
+    <script
+      defer
+      src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
+      integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      defer
+      src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js"
+      integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- jQuery CDN - Slim version (=without AJAX) -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Popper.JS -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+      integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap JS -->
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+      integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="text/javascript">
+      const Sort = {
+        BY_DATE: "recentdate",
+        BY_EXPIRATION: "expiration",
+        BY_COUNT: "count",
+      };
+
+      let sortMode = Sort.BY_DATE;
+      let myfridgeMode = false;
+
+      $(document).ready(function () {
+        $("#sidebarCollapse").on("click", function () {
+          $("#sidebar").toggleClass("active");
+          $(this).toggleClass("active");
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <!-- Sidebar Holder -->
+      <nav id="sidebar">
+        <div class="sidebar-header">
+          <h3>모두의 냉장고</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+          <p>층별 선택</p>
+
+          <li>
+            <a href="#">1층</a>
+          </li>
+          <li>
+            <a href="#">2층</a>
+          </li>
+          <li>
+            <a href="#">3층</a>
+          </li>
+          <li>
+            <a href="#">4층</a>
+          </li>
+          <li>
+            <a href="#">5층</a>
+          </li>
+          <li>
+            <a href="#">6층</a>
+          </li>
+          <li>
+            <a href="#">7층</a>
+          </li>
+          <li>
+            <a href="#">8층</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Page Content Holder -->
+      <div id="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+            <button type="button" id="sidebarCollapse" class="navbar-btn">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+
+            <button type="button" class="btn btn-outline-primary">
+              모두의 냉장고
+            </button>
+
+            <button type="button" class="btn btn-outline-primary">10층</button>
+
+            <!--<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fas fa-align-justify"></i>
+                    </button> -->
+          </div>
+        </nav>
+
+        <div class="wrap-main">
+          <div class="user-contents">
+            <div class="circle-box" style="background: #bdbdbd">
+              <img
+                class="profile"
+                src="https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800"
+              />
+            </div>
+            <h4>안녕하세요 OOO님!</h4>
+            <h3>104호</h3>
+            <p>등록한 음식: 0개</p>
+
+            <button type="button" class="btn btn-outline-primary" id="myfridge">
+              마이냉장고
+            </button>
+            <a
+              class="btn btn-primary btn-lg"
+              href="#"
+              role="button"
+              id="btn-posting-box"
+            >
+              등록하기
+            </a>
+          </div>
+          <div class="main-contents">
+            <div class="tabs">
+              <ul>
+                <li class="is-active"><a>최신순</a></li>
+                <li><a>유통기한 낮은순</a></li>
+                <li><a>개수 적은순</a></li>
+              </ul>
+            </div>
+            <p></p>
+            <div id="cards-box" class="card-columns">
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+            </div>
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

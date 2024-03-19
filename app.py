@@ -10,7 +10,7 @@ app.secret_key = "your_very_secret_and_complex_key_here"
 from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
-db = client.dbweek0test
+db = client.dbrefrigerator
 
 
 ## HTML을 주는 부분
@@ -88,7 +88,7 @@ def find():
         )  # token디코딩합니다.
         userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
         print(userinfo)
-        return render_template("main.html", user_info=userinfo)
+        return render_template("index.html", user_info=userinfo)
 
     except jwt.ExpiredSignatureError:
         flash("로그인 시간이 만료되었습니다.")
