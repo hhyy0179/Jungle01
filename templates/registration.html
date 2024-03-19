@@ -44,24 +44,19 @@
         });
 
     </script>
-
 </head>
 
 <body>
-
     <div class="wrapper">
-
         <!-- Sidebar Holder -->
         <nav id="sidebar">
             <div class="sidebar-header">
                 <h3>모두의 냉장고</h3>
             </div>
-    
             <ul class="list-unstyled components">
                 <p>
                     층별 선택
                 </p>
-                
                 <li>
                     <a href="#">1층</a>
                 </li>
@@ -112,16 +107,102 @@
 
             <div class ="wrap-main">
                 <p>
-                    사진 업로드 <button type="button" class="btn btn-outline-success"> 파일 선택하기 </button>
+                    <div class = "img-upload">
+                        <form method="post" enctype="multipart/form-data">
+                            사진 업로드 
+                            <button type="button" class="btn btn-outline-success">
+                                <label for="chooseFile">
+                                    파일 선택하기
+                                </label>
+                            </button>
+                            <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)">
+                        </form>
+                    </div>
                 </p>
                 <p>
-                    음식 이름: <input type="text" />
+                    <div class = "food_inputname">
+                        음식 이름: <input type="text" />
+                    </div>
                 </p>
                 <p>
-                    유통 기한: <input type="text" />
+                    <div class="container has-text-left">
+                        <div class="row">
+                            유통 기한: 
+                            <div class = "select-year">
+                                <div class="dropdown">
+                                    <div class="dropdown-trigger">
+                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
+                                        <span>2024</span>
+                                        <span class="icon is-small">
+                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        </span>
+                                        </button>
+                                    </div>
+                                    <div class="dropdown-menu" id="dropdown-menu3" role="menu">
+                                        <div class="dropdown-content">
+                                        <a href="#" class="dropdown-item">
+                                            Overview
+                                        </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                년
+                            </div>
+                            <div class = "select-month">
+                                <div class="dropdown">
+                                    <div class="dropdown-trigger">
+                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
+                                        <span>01</span>
+                                        <span class="icon is-small">
+                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        </span>
+                                        </button>
+                                    </div>
+                                    <div class="dropdown-menu" id="dropdown-menu3" role="menu">
+                                        <div class="dropdown-content">
+                                        <a href="#" class="dropdown-item">
+                                            Overview
+                                        </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                월
+                            </div>
+                            <div class = "select-day">
+                                <div class="dropdown">
+                                    <div class="dropdown-trigger">
+                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
+                                        <span>01</span>
+                                        <span class="icon is-small">
+                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        </span>
+                                        </button>
+                                    </div>
+                                    <div class="dropdown-menu" id="dropdown-menu3" role="menu">
+                                        <div class="dropdown-content">
+                                        <a href="#" class="dropdown-item">
+                                            Overview
+                                        </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                일
+                            </div>
+                        </div>
+                    </div>
                 </p>
-                
 
+                <p>
+                    <div class = "food_inputmemo">
+                        메모: <textarea id="post-comment" class="form-control" rows="2"></textarea>
+                    </div>
+                </p>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-btn btn-secondary" type="button">취소하기</button>
+                    <button class="btn btn-primary me-md-2" type="button">등록하기</button>
+                </div>
+            
             </div>
         </div>
     </div>
