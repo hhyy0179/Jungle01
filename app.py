@@ -3,14 +3,7 @@ import jwt
 import hashlib
 from datetime import datetime, timezone, timedelta
 
-from flask import Flask, flash, render_template, jsonify, request, redirect, url_for
-import jwt
-import hashlib
-from datetime import datetime, timezone, timedelta
-
 app = Flask(__name__)
-SECRET_KEY = "REDSEVEN"
-app.secret_key = "your_very_secret_and_complex_key_here"
 SECRET_KEY = "REDSEVEN"
 app.secret_key = "your_very_secret_and_complex_key_here"
 
@@ -29,7 +22,6 @@ def home():
 @app.route("/sign")
 def login():
     return render_template("signup.html")
-
 
 @app.route("/sign", methods=["POST"])  # 회원가입
 def join():
@@ -76,7 +68,7 @@ def api_login():
     if result is not None:
         # JWT 토큰 생성
         payload = {
-            "id": id_recieve,
+            "id": id_recieve, 
             "exp": datetime.now(timezone.utc) + timedelta(hours=2),
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
@@ -156,4 +148,4 @@ def find():
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=5000, debug=True)
+    app.run("0.0.0.0", port=5001, debug=True)

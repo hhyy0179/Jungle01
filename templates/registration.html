@@ -43,6 +43,34 @@
             });
         });
 
+        var submit = document.getElementById('submitButton');
+        submit.onclick = showImage; 
+
+        function loadFile(input) {
+            var file = input.files[0];	//선택된 파일 가져오기
+
+            //미리 만들어 놓은 div에 text(파일 이름) 추가
+            var name = document.getElementById('fileName');
+            name.textContent = file.name;
+
+            //새로운 이미지 div 추가
+            var newImage = document.createElement("img");
+            newImage.setAttribute("class", 'img');
+
+            //이미지 source 가져오기
+            newImage.src = URL.createObjectURL(file);   
+
+            newImage.style.width = "70%";
+            newImage.style.height = "70%";
+            newImage.style.objectFit = "contain";
+
+            //이미지를 image-show div에 추가
+            var container = document.getElementById('image-show');
+            container.appendChild(newImage);
+            // container.removeChild(container.firstChild);
+            
+        };
+
     </script>
 </head>
 
@@ -94,41 +122,50 @@
                         <span></span>
                     </button>
 
-                    <button type="button" class="btn btn-outline-primary">모두의 냉장고</button>
+                    <p class = "title-top" > 모두의 냉장고</p>
 
-                    <button type="button" class="btn btn-outline-primary"> 등록하기</button>
-
-                    <!--<button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="fas fa-align-justify"></i>
-                    </button> -->
-
+                    <div class="alert alert-primary" role="alert" id="current-floor-btn" style="width: 110px; text-align: center;">
+                        등록하기
+                    </div>
                 </div>
             </nav>
 
             <div class ="wrap-main">
                 <p>
-                    <div class = "img-upload">
-                        <form method="post" enctype="multipart/form-data">
-                            사진 업로드 
-                            <button type="button" class="btn btn-outline-success">
-                                <label for="chooseFile">
-                                    파일 선택하기
-                                </label>
-                            </button>
-                            <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)">
-                        </form>
+                    <div class = "img-upload" style="margin-bottom: 30px;">
+
+                        <div class="container">
+                            <div class="image-upload" id="image-upload">
+                                <form method="post" enctype="multipart/form-data">
+                                    사진 업로드: 
+                                    <button type="button" class="btn btn-outline-success" style="margin-left: 30px;">
+                                        <label for="chooseFile">
+                                            파일 선택하기
+                                        </label>
+                                        <div class="fileInput">
+                                            <p id="fileName"></p>
+                                        </div>
+                                    </button>
+                                    <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)">
+                                </form>
+                            </div>
+                            
+                            <div class="image-show" id="image-show"></div>
+                        </div>
+                        
+                        
                     </div>
                 </p>
                 <p>
-                    <div class = "food_inputname">
-                        음식 이름: <input type="text" />
+                    <div class = "food_inputname" style="margin-bottom: 30px;" >
+                        음식 이름: <input type="text" style="margin-left: 30px;" />
                     </div>
                 </p>
                 <p>
-                    <div class="container has-text-left">
+                    <div class="container has-text-left" style="margin-bottom: 30px;" >
                         <div class="row">
                             유통 기한: 
-                            <div class = "select-year">
+                            <div class = "select-year" style="margin-left: 30px;">
                                 <div class="dropdown">
                                     <div class="dropdown-trigger">
                                         <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
@@ -143,12 +180,13 @@
                                         <a href="#" class="dropdown-item">
                                             Overview
                                         </a>
+                                        
                                         </div>
                                     </div>
                                 </div>
                                 년
                             </div>
-                            <div class = "select-month">
+                            <div class = "select-month" style="margin-left: 20px;">
                                 <div class="dropdown">
                                     <div class="dropdown-trigger">
                                         <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
@@ -168,7 +206,7 @@
                                 </div>
                                 월
                             </div>
-                            <div class = "select-day">
+                            <div class = "select-day" style="margin-left: 20px;">
                                 <div class="dropdown">
                                     <div class="dropdown-trigger">
                                         <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
@@ -193,13 +231,13 @@
                 </p>
 
                 <p>
-                    <div class = "food_inputmemo">
-                        메모: <textarea id="post-comment" class="form-control" rows="2"></textarea>
+                    <div class = "food_inputmemo" style="margin-bottom: 30px;">
+                        메모: <textarea id="post-comment" class="form-control" rows="5"></textarea>
                     </div>
                 </p>
 
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button class="btn btn-btn btn-secondary" type="button">취소하기</button>
+                    <button class="btn btn-btn btn-secondary" type="button" style = "margin-right: 30px;">취소하기</button>
                     <button class="btn btn-primary me-md-2" type="button">등록하기</button>
                 </div>
             

@@ -265,4 +265,28 @@ label {
     visibility: hidden;
 }
 
+.wrap img {
+    display: hidden;;
+    width:100px;
+    height:100px;
+}
 
+.wrap {
+    border-radius: 50%;
+    overflow: hidden;
+    width:100px;
+    height:100px;
+    border:2px solid black;
+    position: absolute;
+    top: 130px;
+    display: hidden;
+}
+
+.imgbtn {
+    background-image: url("https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800");
+    background-size: cover;
+    border-radius: 50%;
+    width:100px;
+    height:100px;
+    border:2px solid black;
+}
