@@ -71,7 +71,7 @@ def join():
     name_recieve = request.form["name_give"]
     pw_recieve = request.form["pw_give"]
     room_recieve = int(request.form["room_give"])
-    count_recieve = request.form["count_give"]
+    count_recieve = int(request.form["count_give"])
 
     result = db.users.find_one({"user_id": id_recieve})
 
@@ -92,7 +92,7 @@ def join():
                 "pwd": pw_recieve,
                 "name": name_recieve,
                 "room_number": room_recieve,
-                "food_count": count_recieve,
+                "regi_count": count_recieve,
             }
         )
         db.refrigerator.insert_one(
@@ -101,7 +101,7 @@ def join():
                 "pwd": pw_recieve,
                 "name": name_recieve,
                 "room_number": room_recieve,
-                "food_count": count_recieve,
+                "regi_count": count_recieve,
             }
         )
         return jsonify({"result": "success"})
@@ -147,18 +147,19 @@ def find():
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
         userinfo = db.refrigerator.find_one({"user_id": payload["user_id"]}, {"_id": 0})
-        print(userinfo)
+        userinfo1 = db.users.find_one({"user_id": payload["user_id"]}, {"_id": 0})
+        # print(userinfo)
         floors = [i for i in range(1, 23)]
         roomFloor = int(userinfo.get("room_number", "1")) // 100
         foods = list(
             db.refrigerator.find(
-                {"refrigerator_floor": roomFloor, "food_count": {"$ne": 0}}
+                {"refrigerator_floor": roomFloor, "regi_count": {"$ne": 0}}
             )
         )
         # print(foods[0])
         return render_template(
             "index.html",
-            user_info=userinfo,
+            user_info=userinfo1,
             floors=floors,
             roomFloor=roomFloor,
             foods=foods,
@@ -294,6 +295,7 @@ def post_foods():
     memo_receive = request.form["memo_give"]
 
     user = db.users.find_one({"user_id": userId_receive})
+    new_regi = user["regi_count"] + 1
 
     print("---asasd-")
     print(userId_receive)
@@ -318,6 +320,7 @@ def post_foods():
     }
 
     db.refrigerator.insert_one(food)
+    db.users.update_one({"user_id": userId_receive}, {"$set": {"regi_count": new_regi}})
 
     return jsonify({"result": "success"})
     # if int(foodCount_receive) > 0:
@@ -335,14 +338,26 @@ def apply():
     print("현재 음식 개수", food["food_count"])
 
     new_food_count = food["food_count"] - 1
-    result = db.refrigerator.update_one(
-        {"_id": food["_id"]}, {"$set": {"food_count": new_food_count}}
-    )
 
-    if result.modified_count == 1:
-        return jsonify({"result": "success"})
+    if new_food_count <= 0:
+        # 음식 개수가 0 이하가 되면 해당 문서를 삭제
+        result = db.refrigerator.delete_one({"_id": food["_id"]})
+        if result.deleted_count == 1:
+
+            return jsonify(
+                {"result": "success", "msg": "음식이 모두 소모되어 삭제되었습니다."}
+            )
+        else:
+            return jsonify({"result": "failure", "msg": "음식 삭제 실패"})
     else:
-        return jsonify({"result": "failure"})
+        # 음식 개수가 1 이상이면 개수를 업데이트
+        result = db.refrigerator.update_one(
+            {"_id": food["_id"]}, {"$set": {"food_count": new_food_count}}
+        )
+        if result.modified_count == 1:
+            return jsonify({"result": "success"})
+        else:
+            return jsonify({"result": "failure"})
 
 
 # # 음식 등록하기 api
