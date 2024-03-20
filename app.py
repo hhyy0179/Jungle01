@@ -1,16 +1,18 @@
-from flask import Flask, flash, render_template, jsonify, request, redirect, url_for
-import jwt
-import hashlib
-from datetime import datetime, timezone, timedelta
-
-from flask import Flask, flash, render_template, jsonify, request, redirect, url_for
+from flask import (
+    Flask,
+    flash,
+    make_response,
+    render_template,
+    jsonify,
+    request,
+    redirect,
+    url_for,
+)
 import jwt
 import hashlib
 from datetime import datetime, timezone, timedelta
 
 app = Flask(__name__)
-SECRET_KEY = "REDSEVEN"
-app.secret_key = "your_very_secret_and_complex_key_here"
 SECRET_KEY = "REDSEVEN"
 app.secret_key = "your_very_secret_and_complex_key_here"
 
@@ -56,11 +58,11 @@ def join():
     else:
         db.users.insert_one(
             {
-                "id": id_recieve,
-                "pw": pw_recieve,
-                "name_give": name_recieve,
-                "room": room_recieve,
-                "count": count_recieve,
+                "user_id": id_recieve,
+                "pwd": pw_recieve,
+                "name": name_recieve,
+                "room_number": room_recieve,
+                "food_count": count_recieve,
             }
         )
         return jsonify({"result": "success"})
@@ -72,15 +74,15 @@ def api_login():
     pw_recieve = request.form["pw_give"]
 
     result = db.users.find_one(
-        {"id": id_recieve, "pw": pw_recieve}
+        {"user_id": id_recieve, "pwd": pw_recieve}
     )  # id, 암호화된pw을 가지고 해당 유저를 찾습니다.
 
     # JWT 토큰 발급
     if result is not None:
         # JWT 토큰 생성
         payload = {
-            "id": id_recieve,
-            "exp": datetime.now(timezone.utc) + timedelta(hours=2),
+            "user_id": id_recieve,
+            "exp": datetime.now(timezone.utc) + timedelta(hours=24),
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
         return jsonify({"result": "success", "token": token})
@@ -88,29 +90,38 @@ def api_login():
         return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 틀렸습니다."})
 
 
-@app.route("/index", methods=["GET"])  # 메인 페이지
+@app.route("/logout", methods=["POST"])
+def logout():
+    response = make_response(redirect(url_for("home")))
+    response.set_cookie("mytoken", "", expires=0)  # 쿠키 삭제
+    return response
+
+
+@app.route("/index")  # 메인 페이지
 def find():
+    # foodList = show_foods()
     token_receive = request.cookies.get("mytoken")
     foodList = show_foods()
     try:
         payload = jwt.decode(
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
-        userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
+        userinfo = db.refrigerator.find_one({"user_id": payload["user_id"]}, {"_id": 0})
         print(userinfo)
         floors = [i for i in range(1, 23)]
-        roomnumber = int(userinfo.get("room", "1")) // 100
-        floor = request.args.get("floorNum", roomnumber)
-        print(roomnumber)
-        print(floor)
+        roomFloor = int(userinfo.get("room_number", "1")) // 100
+        foods = list(
+            db.refrigerator.find(
+                {"refrigerator_floor": roomFloor, "food_count": {"$ne": 0}}
+            )
+        )
 
         return render_template(
             "index.html",
             user_info=userinfo,
             floors=floors,
-            roomnumber=roomnumber,
-            foodList=foodList,
-            floor=floor,
+            roomFloor=roomFloor,
+            foods=foods,
         )
 
     except jwt.ExpiredSignatureError:
@@ -122,118 +133,78 @@ def find():
 
 
 # db에서 음식 정보 불러오기
-# @app.route("/index/list/sort", methods=["GET"])
+# @app.route("/index/list", methods=["GET"])
+# def show_foods():
+#     print(1)
+#     sortMode = request.args.get("sortMode", "expiration")
+
+#     if sortMode == "expiration":
+#         foods_cursor = db.refrigerator.find(
+#             {"food_count": {"$ne": 0}}, {"_id": 0}
+#         ).sort(
+#             [("expiration_year", -1), ("expiration_month", -1), ("expiration_day", -1)]
+#         )
+#         foods = list(foods_cursor)
+#         print(foods)
+#     else:
+#         return jsonify({"result": "failure"})
+
+#     return jsonify({"result": "success", "foods-list": foods})
+
+
+@app.route("/index/list", methods=["GET"])
 def show_foods():
-    # client 에서 요청한 정렬 방식이 있는지를 확인합니다. 없다면 기본으로 최신 순으로 정렬합니다.
-    sortMode = "expiration"
+    floor = request.args.get("floor")  # 클라이언트에서 요청한 층수
+    print(floor)
 
-    # db에 있는 음식 주어진 정렬 방식으로 정렬
-    # 최신 순
-    if sortMode == "latest":
-        foods = list(db.refrigerator.find({}))
-        foods = sorted(
-            foods,
-            key=lambda x: (
-                x["registration_year"],
-                x["registration_month"],
-                x["registration_day"],
-            ),
-            # reverse=True,
+    try:
+        # 해당 층의 음식 정보만 필터링
+        foods_cursor = db.refrigerator.find(
+            {"food_count": {"$ne": 0}, "refrigerator_floor": int(floor)}, {"_id": 0}
+        ).sort(
+            [("expiration_year", -1), ("expiration_month", -1), ("expiration_day", -1)]
         )
-    # 유통기한 낮은 순
-    elif sortMode == "expiration":
-        foods = list(db.refrigerator.find({}))
-        foods = sorted(
-            foods,
-            key=lambda x: (
-                x["expiration_year"],
-                x["expiration_month"],
-                x["expiration_day"],
-            ),
-        )
-    # 개수 적은 순
-    elif sortMode == "count":
-        foods = list(db.refrigerator.find({}))
-        foods = sorted(foods, key=lambda x: x["food_count"])
-
-    return foods
+        foods = list(foods_cursor)
+        return jsonify({"result": "success", "foods-list": foods})
+    except Exception as e:
+        return jsonify({"result": "failure", "msg": str(e)})
 
 
-# 음식 등록하기 api
-@app.route("/registration", methods=["POST"])
-def post_foods():
-    # 클라이언트로부터 데이터를 받기
-    userId_receive = request.form["userId_give"]
-    foodImage_receive = request.form["foodImage_give"]
-    foodName_receive = request.form["food_give"]
-    registrationDate_receive = request.form["registrationDate_give"]
-    expirationDate_receive = request.form["expirationDate_give"]
-    memo_receive = request.form["memo_give"]
-
-    user = db.refrigerator.find_one({"user_id": userId_receive})
-
-    food = {
-        "user_id": userId_receive,
-        "pwd": user["pwd"],
-        "name": user["name"],
-        "room_number": user["room_number"],
-        "refrigerator_floor": user["refrigerator_floor"],
-        "registration_year": registrationDate_receive["year"],
-        "registration_month": registrationDate_receive["month"],
-        "registration_day": registrationDate_receive["day"],
-        "expiration_year": expirationDate_receive["year"],
-        "expiration_month": expirationDate_receive["month"],
-        "expiration_day": expirationDate_receive["day"],
-        "food_name": "우유",
-        "food_image": "우유 사진",
-        "food_count": 1,
-    }
+@app.route("/registration")
+def registration():
+    return render_template("registration.html")
 
 
-# # 회원정보수정
-# @app.route("/mypage/edit", methods=["POST"])
-# def modify():
-#     token_receive = request.cookies.get("mytoken")
-#     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
+# # 음식 등록하기 api
+# @app.route("/registration", methods=["POST"])
+# def post_foods():
+#     # 클라이언트로부터 데이터를 받기
+#     userId_receive = request.form["userId_give"]
+#     foodImage_receive = request.form["foodImage_give"]
+#     foodName_receive = request.form["food_give"]
+#     registrationDate_receive = request.form["registrationDate_give"]
+#     expirationDate_receive = request.form["expirationDate_give"]
+#     memo_receive = request.form["memo_give"]
 
-#     pw_recieve = request.form["pw_give"]
-#     num_recieve = request.form["num_give"]
+#     user = db.refrigerator.find_one({"user_id": userId_receive})
 
-#     dryingrack_recieve = request.form["dryingrack_give"]
-#     curlingiron_recieve = request.form["curlingiron_give"]
-#     detergent_recieve = request.form["detergent_give"]
-#     fever_recieve = request.form["fever_give"]
-#     hanger_recieve = request.form["hanger_give"]
-#     painkiller_recieve = request.form["painkiller_give"]
-
-#     db.users.update_many(
-#         {"id": payload["id"]}, {"$set": {"pw": pw_recieve, "room": num_recieve}}
-#     )
-#     db.users.update_many(
-#         {"id": payload["id"]},
-#         {
-#             "$set": {
-#                 "dryingrack": dryingrack_recieve,
-#                 "curlingiron": curlingiron_recieve,
-#                 "detergent": detergent_recieve,
-#                 "fever": fever_recieve,
-#                 "hanger": hanger_recieve,
-#                 "painkiller": painkiller_recieve,
-#             }
-#         },
-#     )
-
-#     return jsonify({"result": "success", "msg": "회원정보가 수정되었습니다."})
-
-
-# # 회원탈퇴
-# @app.route("/mypage/delete", methods=["POST"])
-# def delete():
-#     token_receive = request.cookies.get("mytoken")
-#     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=["HS256"])
-#     db.users.delete_one({"id": payload["id"]})
-#     return jsonify({"result": "success"})
+#     food = {
+#         "user_id": userId_receive,
+#         "pwd": user["pwd"],
+#         "name": user["name"],
+#         "room_number": user["room_number"],
+#         "refrigerator_floor": user["refrigerator_floor"],
+#         "registration_year": registrationDate_receive["year"],
+#         "registration_month": registrationDate_receive["month"],
+#         "registration_day": registrationDate_receive["day"],
+#         "expiration_year": expirationDate_receive["year"],
+#         "expiration_month": expirationDate_receive["month"],
+#         "expiration_day": expirationDate_receive["day"],
+#         "food_name": "우유",
+#         "food_image": "우유 사진",
+#         "food_count": 1,
+#     }
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=5000, debug=True)
+    app.run("0.0.0.0", port=5001, debug=True)

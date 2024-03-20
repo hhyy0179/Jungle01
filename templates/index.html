@@ -34,8 +34,10 @@
     <!-- Our Custom CSS -->
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
+      href="{{ url_for('static', filename='index_style.css') }}"
     />
+
+    <!-- <link rel="stylesheet" href="index_style.css"> -->
 
     <!-- Font Awesome JS -->
     <script
@@ -56,7 +58,8 @@
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
       crossorigin="anonymous"
-    ></script> -->
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- Popper.JS -->
     <script
@@ -73,12 +76,12 @@
 
     <script type="text/javascript">
       const Sort = {
-        BY_DATE: "latest",
+        // BY_DATE: "recentdate",
         BY_EXPIRATION: "expiration",
-        BY_COUNT: "count",
+        // BY_COUNT: "count"
       };
 
-      let sortMode = Sort.BY_DATE;
+      let sortMode = Sort.BY_EXPIRATION;
       let myfridgeMode = false;
 
       $(document).ready(function () {
@@ -86,35 +89,112 @@
           $("#sidebar").toggleClass("active");
           $(this).toggleClass("active");
         });
+        showFood();
       });
-    </script>
-    <script>
-      var floor = 0;
+
+      function logout() {
+        // 로그아웃 요청을 서버로 보냄 (서버에서 쿠키를 사용하는 경우)
+        $.ajax({
+          type: "POST",
+          url: "/logout",
+          success: function (response) {
+            window.location.href = "/";
+          },
+        });
+      }
+      
+
+      // window.onload = () => {
+      //     const token = localStorage.getItem('mytoken');
+      //     if (!token) {
+      //         // 토큰이 없거나 유효하지 않으면 로그인 페이지로 리다이렉트
+      //         window.location.href = '/';
+      //     }
+      //     // 추가적으로, 서버에 토큰 유효성 검사 요청을 보내는 로직을 구현할 수도 있습니다.
+      // };
+
+    //   function showFood() {
+    //     $("#cards-box").empty();
+    //     $.ajax({
+    //       type: "GET",
+    //       url: "/index/list",
+    //       data: { sortMode: sortMode },
+    //       success: function (response) {
+    //         if (response["result"] != "success") {
+    //           alert(sortMode + "순으로 음식 목록 받아오기 실패");
+    //           return;
+    //         }
+    //         alert("연결");
+    //         let foods = response["foods-list"];
+    //         addFoodCards(foods);
+    //       },
+    //     });
+    //   }
+
+
+      function addFoodCards(foods) {
+        for (let i = 0; i < foods.length; i++) {
+          let food = foods[i];
+
+          let food_name = food["food_name"];
+
+          let expiration_year = food["expiration_year"];
+          let expiration_month = food["expiration_month"];
+          let expiration_day = food["expiration_day"];
+          let food_count = food["food_count"];
+
+          let name = food["name"];
+          let refrigerator_floor = food["refrigerator_floor"];
+          let room_number = food["room_number"];
+
+          let cardContentHtml = `
+                    <div class="card">
+                        <img class="card-img-top"
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                            
+                            alt="Card image cap">
+
+                        <div class="card-body">
+                            <p class = "food-name"> 음식 이름: ${food_name}</p>
+                            <p class="food-expiration">유통기한: ${expiration_year}.${expiration_month}.${expiration_day}</p>
+                            <p class="user-addr">호수: ${room_number}</p>
+                            <p class="user-name">주민이름: ${name}</p>
+                            <p class="user-memo">메모: </p>
+                            <div class="box" style= "background-color: rgb(211, 246, 255);">
+                                메모메모
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
+                        </div>
+                    </div>
+                `;
+          $("#cards-box").append(cardContentHtml);
+        }
+      }
+
       function changeFloorText(element) {
         // 클릭된 요소에서 data-floor 속성 값 가져오기
         floor = element.getAttribute("data-floor");
         // 현재 층을 나타내는 버튼의 텍스트 업데이트
-        document.querySelector(".btn.btn-outline-primary").textContent =
+        document.querySelector(".alert.alert-primary").textContent =
           floor + "층";
-      }
-      // document.getElementById("current-floor-btn").textContent = floor + "층";
 
-      // 층별로 냉장고 음식 불러오기
-      function floorLoad(element) {
-        let floor = element.getAttribute("data-floor");
-        console.log(floor);
+        $("#cards-box").empty();
         $.ajax({
           type: "GET",
-          url: "/index",
-          data: { floorNum: floor },
-          error: function (xhr, status, error) {
-            alert("에러 발생");
-          },
+          url: "/index/list",
+          data: { floor: floor},
           success: function (response) {
-            alert(response.floorn);
+            if (response["result"] != "success") {
+              alert(floor + "음식 목록 받아오기 실패");
+              return;
+            }
+            alert("연결");
+            let foods = response["foods-list"];
+            addFoodCards(foods);
           },
         });
       }
+      // document.getElementById('current-floor-btn').textContent = floor + '층';
     </script>
   </head>
 
@@ -158,15 +238,27 @@
               <span></span>
             </button>
 
-            <p>모두의 냉장고</p>
+            <p class="title-top">모두의 냉장고</p>
 
-            <button
-              type="button"
-              class="btn btn-outline-primary"
+            <div
+              class="alert alert-primary"
+              role="alert"
               id="current-floor-btn"
+              style="width: 80px; text-align: center"
             >
-              {{ roomnumber }}층
-            </button>
+              {{ roomFloor }}층
+            </div>
+            <div>
+              <button
+                type="button"
+                class="btn btn-danger alert-danger"
+                id="logout-btn"
+                style="width: 80px; text-align: center"
+                onclick="logout()"
+              >
+                logout
+              </button>
+            </div>
           </div>
         </nav>
 
@@ -178,21 +270,28 @@
                 src="https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800"
               />
             </div>
-            <h4>안녕하세요 {{user_info.name_give}}님!</h4>
-            <h3>{{user_info.room}}호</h3>
-            <p>등록한 음식: 0개</p>
+            <div class="hello-user">
+              <h4>안녕하세요</h4>
+              <h4>{{user_info.name}}님!</h4>
+              <h3>{{user_info.room_number}}호</h3>
+              <p style="font-size: 15px">
+                등록한 음식: {{user_info.food_count}}개
+              </p>
+            </div>
 
-            <button type="button" class="btn btn-outline-primary" id="myfridge">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              id="myfridge_btn"
+            >
               마이냉장고
             </button>
             <a
-              class="btn btn-primary btn-lg"
-              href="#"
-              role="button"
-              id="btn-posting-box"
+              href="/registration"
+              class="btn btn-primary"
+              id="registration_btn"
+              >등록하기</a
             >
-              등록하기
-            </a>
           </div>
           <div class="main-contents">
             <div class="tabs">
@@ -202,81 +301,31 @@
                 <li><a>개수 적은순</a></li>
               </ul>
             </div>
-            <p></p>
+            <p>
+              <div id="cards-box" class="card-columns">
+                {% for food in foods %}
+                            <div class="card">
+                                <img class="card-img-top"
+                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                                    
+                                    alt="Card image cap">
 
-            <div id="cards-box" class="card-columns">
-              {% for item in foodList %} {% if item['refrigerator_floor'] ==
-              floor %}
-              <div class="card">
-                <img
-                  class="card-img-top"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                  alt="Card image cap"
-                />
-                <div class="card-body">
-                  <p class="food-name">음식 이름: {{item['food_name']}}</p>
-                  <p class="food-expiration">
-                    유통기한:
-                    {{item['expiration_year']}}-{{item['expiration_month']}}-{{item['expiration_day']}}
-                  </p>
-                  <p class="user-addr">호수: {{item['room_number']}}</p>
-                  <p class="user-name">주인이름: {{item['name']}}</p>
-                  <p class="user-name">음식 개수: {{item['food_count']}}</p>
-                  <p class="user-memo">메모:</p>
-                  <div class="box" style="background-color: rgb(211, 246, 255)">
-                    {{item['memo']}}
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    id="subscription"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                  >
-                    신청하기
-                  </button>
-
-                  <!-- 모달 -->
-                  <div
-                    class="modal fade"
-                    id="exampleModal"
-                    tabindex="-1"
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                  >
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h1 class="modal-title fs-5" id="exampleModalLabel">
-                            Modal title
-                          </h1>
-                          <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                          ></button>
+                                <div class="card-body">
+                                    <p class = "food-name"> 음식 이름: {{ food.food_name }}</p>
+                                    <p class="food-expiration">유통기한: {{ food.expiration_year }}.{{ food.expiration_month }}.{{ food.expiration_day }}</p>
+                                    <p class="user-addr">호수: {{ food.room_number }}</p>
+                                    <p class="user-name">주민이름: {{ food.name }}</p>
+                                    <p class="user-memo">메모: </p>
+                                    <div class="box" style= "background-color: rgb(211, 246, 255);">
+                                        메모메모
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
                         </div>
-                        <div class="modal-body">...</div>
-                        <div class="modal-footer">
-                          <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                          >
-                            Close
-                          </button>
-                          <button type="button" class="btn btn-primary">
-                            Save changes
-                          </button>
-                        </div>
-                      </div>
                     </div>
-                  </div>
+                    {% endfor %}
+                            
                 </div>
-              </div>
-              {% endif %} {% endfor %}
-            </div>
+            </p>
           </div>
         </div>
       </div>
