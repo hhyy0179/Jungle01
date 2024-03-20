@@ -76,6 +76,7 @@
         let id = $("#id").val();
         let pw = $("#pw").val();
         let room = $("#room").val();
+        let count = 0;
 
         $.ajax({
           type: "POST",
@@ -85,6 +86,7 @@
             name_give: name,
             pw_give: pw,
             room_give: room,
+            count_give: count,
           },
           success: function (response) {
             if (response["result"] == "success") {
