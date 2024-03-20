@@ -14,7 +14,7 @@ p {
     font-size: 1.1em;
     font-weight: 300;
     line-height: 1.7em;
-    color: #999;
+    color: #000000;
 }
 
 a, a:hover, a:focus {
@@ -236,13 +236,31 @@ a.article, a.article:hover {
 
 .wrap-main {
     width: 900px;
-    margin: 10px auto;
+    margin: 50px auto;
+}
+
+.wrap-user-info {
+    width: 700px;
+    margin: 30px auto;
+}
+
+.wrap-check-registration {
+    width: 900px;
+    margin-top: 60px;
+    border: 2px solid rgb(47, 77, 183);
+    border-radius: 50px;
+}
+
+.check-contents {
+    margin: 30px;
+    font-weight: 500;
 }
 
 .button {
     display: flex;
     justify-content: center;
 }
+
 label {
     cursor: pointer;
     font-size: 1em;
@@ -254,15 +272,19 @@ label {
     border-radius: 70%;
     overflow: hidden;
 }
+
 .profile {
     width: 200%;
     height: 200%;
     object-fit: cover;
 }
 
-/* 못생긴 기존 input 숨기기 */
 #chooseFile {
     visibility: hidden;
+}
+
+hr {
+    color:#2e3f84;
 }
 
 .wrap img {
