@@ -23,6 +23,7 @@ app.secret_key = "your_very_secret_and_complex_key_here"
 from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
+# client = MongoClient("mongodb://test:test@43.200.173.147", 27017)
 db = client.dbrefrigerator
 
 
@@ -69,7 +70,7 @@ def join():
     id_recieve = request.form["id_give"]
     name_recieve = request.form["name_give"]
     pw_recieve = request.form["pw_give"]
-    room_recieve = request.form["room_give"]
+    room_recieve = int(request.form["room_give"])
     count_recieve = request.form["count_give"]
 
     result = db.users.find_one({"id": id_recieve})
@@ -86,6 +87,15 @@ def join():
         return jsonify({"result": "fail", "msg": "이미 사용중인 ID입니다!"})
     else:
         db.users.insert_one(
+            {
+                "user_id": id_recieve,
+                "pwd": pw_recieve,
+                "name": name_recieve,
+                "room_number": room_recieve,
+                "food_count": count_recieve,
+            }
+        )
+        db.refrigerator.insert_one(
             {
                 "user_id": id_recieve,
                 "pwd": pw_recieve,
@@ -114,6 +124,8 @@ def api_login():
             "exp": datetime.now(timezone.utc) + timedelta(hours=24),
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+        # 배포할땐 바꾸기
+        # token = jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("UTF-8")
         return jsonify({"result": "success", "token": token})
     else:
         return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 틀렸습니다."})
@@ -198,9 +210,95 @@ def show_foods():
         return jsonify({"result": "failure", "msg": str(e)})
 
 
+# 등록하기 페이지 불러오기
 @app.route("/registration")
-def registration():
-    return render_template("registration.html")
+def load_registeration():
+
+    token_receive = request.cookies.get("mytoken")
+
+    try:
+        payload = jwt.decode(
+            token_receive, SECRET_KEY, algorithms=["HS256"]
+        )  # token디코딩합니다.
+        userinfo = db.users.find_one({"user_id": payload["user_id"]}, {"_id": 0})
+
+        yearlist = [i for i in range(2020, 2050)]
+        monthlist = [j for j in range(1, 13)]
+        daylist = [k for k in range(1, 32)]
+
+    except jwt.exceptions.DecodeError:
+        flash("로그인 정보가 존재하지 않습니다.")
+        return redirect(url_for("index"))
+
+    return render_template(
+        "registration.html",
+        user_info=userinfo,
+        yearlist=yearlist,
+        monthlist=monthlist,
+        daylist=daylist,
+    )
+
+
+# 음식 등록하기 api
+@app.route("/registration", methods=["POST"])
+def post_foods():
+    # 클라이언트로부터 데이터를 받기
+
+    userId_receive = request.form["userId_give"]
+    foodName_receive = request.form["foodname_give"]
+
+    # static 폴더에 저장될 파일 이름 생성하기
+    foodImage_receive = request.files["foodimage_give"]
+    filename = f"img-{foodName_receive}"
+
+    # 확장자 나누기
+    extension = foodImage_receive.filename.split(".")[-1]
+
+    # static 폴더에 저장
+    save_to = f"static/{filename}.{extension}"
+    foodImage_receive.save(save_to)
+
+    foodCount_receive = request.form["foodcount_give"]
+    currentyear_receive = request.form["currentyear_give"]
+    currentmonth_receive = request.form["currentmonth_give"]
+    currentday_receive = request.form["currentday_give"]
+    expirationyear_receive = request.form["expirationyear_give"]
+    expirationmonth_receive = request.form["expirationmonth_give"]
+    expirationday_receive = request.form["expirationday_give"]
+    memo_receive = request.form["memo_give"]
+
+    user = db.users.find_one({"user_id": userId_receive})
+
+    print("---asasd-")
+    print(userId_receive)
+    print("--dsasds--")
+
+    food = {
+        "user_id": user["user_id"],
+        "pwd": user["pwd"],
+        "name": user["name"],
+        "room_number": int(user["room_number"]),
+        "refrigerator_floor": int(user["room_number"] // 100),
+        "registration_year": int(currentyear_receive),
+        "registration_month": int(currentmonth_receive),
+        "registration_day": int(currentday_receive),
+        "expiration_year": int(expirationyear_receive),
+        "expiration_month": int(expirationmonth_receive),
+        "expiration_day": int(expirationday_receive),
+        "food_name": foodName_receive,
+        "food_image": f"{filename}.{extension}",
+        "food_count": int(foodCount_receive),
+        "memo": memo_receive,
+    }
+
+    db.refrigerator.insert_one(food)
+
+    return jsonify({"result": "success"})
+    # if int(foodCount_receive) > 0:
+    #     #db.refrigerator.insert_one(food)
+
+    # else:
+    #     return jsonify({'result': 'faliure'})
 
 
 # 음식 신청하기 api (html카드 생성에서만 작동)
@@ -253,4 +351,4 @@ def apply():
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=5001, debug=True)
+    app.run("0.0.0.0", port=5000, debug=True)

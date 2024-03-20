@@ -7,7 +7,6 @@ db = client.dbrefrigerator  # 'dbrefrigerator'라는 이름의 db를 만듭니�
 
 # collection에 {doc}을 넣습니다.
 def insert_all():
-
     doc = {
         "user_id": "user4",
         "pwd": "test123",
@@ -23,7 +22,7 @@ def insert_all():
         "food_name": "커피",
         "food_image": "커피 사진",
         "food_count": 2,
-        "memo": "선착순 1명!!",
+        "memo": "선착순 1명",
     }
     db.refrigerator.insert_one(doc)
 
@@ -42,7 +41,7 @@ def insert_all():
         "food_name": "빵",
         "food_image": "빵 사진",
         "food_count": 3,
-        "memo": "선착순 2명!!",
+        "memo": "선착순 1명",
     }
     db.refrigerator.insert_one(doc)
 
@@ -61,7 +60,7 @@ def insert_all():
         "food_name": "우유",
         "food_image": "우유 사진",
         "food_count": 1,
-        "memo": "선착순 3명!!",
+        "memo": "선착순 1명",
     }
     db.refrigerator.insert_one(doc)
 

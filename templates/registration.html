@@ -8,6 +8,12 @@
 
     <title> 모두의 냉장고 </title>
 
+     <!-- Optional JavaScript -->
+        <!-- jQuery and Bootstrap Bundle (includes Popper) -->
+    <script
+        src="https://code.jquery.com/jquery-3.6.0.js"
+        type="text/javascript"></script>
+
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     
@@ -20,32 +26,61 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 
     <!-- Our Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='index_style.css') }}">
+    <!-- <link rel="stylesheet" href="registration_style.css"> -->
+    
+    <!-- ajax 실행 됨. -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+
+     <!-- Our Custom CSS -->
+     <link rel="stylesheet" href="{{ url_for('static', filename='registration_style.css') }}">
+    
 
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
 
     <!-- jQuery CDN - Slim version (=without AJAX) -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+    
+    
     <!-- Popper.JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+
     <!-- Bootstrap JS -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
 
 
     <script type="text/javascript">
 
+        var selectedYear, selectedMonth, selectedDay;
+
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
                 $('#sidebar').toggleClass('active');
                 $(this).toggleClass('active');
             });
+
+            var yearSelect = document.getElementById('yearSelect');
+            var monthSelect = document.getElementById('monthSelect');
+            var daySelect = document.getElementById('daySelect');
+
+            // 선택된 값 가져오기
+            yearSelect.addEventListener('change', function () {
+                selectedYear = yearSelect.value;
+            });
+
+            monthSelect.addEventListener('change', function () {
+                selectedMonth = monthSelect.value;
+            });
+
+            daySelect.addEventListener('change', function () {
+                selectedDay = daySelect.value;
+            });
         });
 
-        var submit = document.getElementById('submitButton');
-        submit.onclick = showImage; 
-
+        var newImage;
         function loadFile(input) {
             var file = input.files[0];	//선택된 파일 가져오기
 
@@ -66,10 +101,58 @@
 
             //이미지를 image-show div에 추가
             var container = document.getElementById('image-show');
+            container.innerHTML = '';
             container.appendChild(newImage);
-            // container.removeChild(container.firstChild);
-            
         };
+
+        function PostFoodInfo() {
+            var user_info =  JSON.parse('{{ user_info | tojson | safe }}');
+            let userid = user_info.user_id;
+            let foodname = $('#food_inputname').val()
+            let foodcount = $('#food_inputcount').val()
+
+            let file = $('#img-file')[0].files[0]
+            let form_data = new FormData()
+
+            //현재 날짜 가져오기
+            date = new Date()
+            let currentyear = date.getFullYear();
+            let currentmonth = date.getMonth();
+            let currentday = date.getDate();
+
+            let memo = $('#post-comment').val()
+
+            form_data.append("userId_give", userid)
+            form_data.append("foodimage_give", file)
+            form_data.append("foodname_give", foodname)
+            form_data.append("foodcount_give", foodcount)
+            form_data.append("currentyear_give", currentyear)
+            form_data.append("currentmonth_give", currentmonth)
+            form_data.append("currentday_give", currentday)
+            form_data.append("expirationyear_give", selectedYear)
+            form_data.append("expirationmonth_give", selectedMonth)
+            form_data.append("expirationday_give", selectedDay)
+            form_data.append("memo_give", memo)
+
+            $.ajax({
+                type:"POST",
+                url:"/registration",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if(response["result"] == 'success')  {
+                        window.location.href = "/index"
+                        alert('등록 완료!')
+                    }
+                    else {
+                        alert('등록 실패!')
+                    }
+                }
+            })
+
+        }
 
     </script>
 </head>
@@ -77,11 +160,11 @@
 <body>
     <div class="wrapper">
         <!-- Sidebar Holder -->
-        <!-- <nav id="sidebar">
+        <nav id="sidebar">
             <div class="sidebar-header">
                 <h3>모두의 냉장고</h3>
-            </div> -->
-            <!-- <ul class="list-unstyled components">
+            </div>
+            <ul class="list-unstyled components">
                 <p>
                     층별 선택
                 </p>
@@ -110,19 +193,19 @@
                     <a href="#">8층</a>
                 </li>
             </ul>
-        </nav> -->
+        </nav>
 
         <!-- Page Content Holder -->
         <div id="content">
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container-fluid">
-                    <!-- <button type="button" id="sidebarCollapse" class="navbar-btn">
+                    <button type="button" id="sidebarCollapse" class="navbar-btn">
                         <span></span>
                         <span></span>
                         <span></span>
-                    </button> -->
+                    </button>
 
-                    <p class = "title-top" style="text-align: center; margin: auto;"> 모두의 냉장고</p>
+                    <p class = "title-top" > 모두의 냉장고</p>
 
                     <div class="alert alert-primary" role="alert" id="current-floor-btn" style="width: 110px; text-align: center;">
                         등록하기
@@ -133,96 +216,76 @@
             <div class ="wrap-main">
                 <p>
                     <div class = "img-upload" style="margin-bottom: 30px;">
+                        <div class="image-upload" id="image-upload">
 
-                        <div class="container">
-                            <div class="image-upload" id="image-upload">
-                                <!-- <form method="post" enctype="multipart/form-data">
-                                    사진 업로드: 
-                                    <button type="button" class="btn btn-outline-success" style="margin-left: 30px;">
-                                        <label for="chooseFile">
-                                            파일 선택하기
-                                        </label>
-                                        <div class="fileInput">
-                                            <p id="fileName"></p>
-                                        </div>
-                                    </button>
-                                    <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)">
-                                </form> -->
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="img-file">
+                                <label class="custom-file-label" for="img-file">Choose file</label>
                             </div>
-                            
-                            <div class="image-show" id="image-show"></div>
+
+                            <!-- <form method="post" enctype="multipart/form-data">
+                                사진 업로드: 
+                                <button type="button" class="btn btn-outline-success" style="margin-left: 30px;">
+                                    <label for="chooseFile">
+                                        파일 선택하기
+                                    </label>
+                                    <div class="fileInput">
+                                        <p id="fileName"></p>
+                                    </div>
+                                </button>
+                                <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)">
+                            </form> -->
                         </div>
                         
-                        
+                        <div class="image-show" id="image-show"></div>
+                
                     </div>
                 </p>
                 <p>
-                    <div class = "food_inputname" style="margin-bottom: 30px;" >
-                        음식 이름: <input type="text" style="margin-left: 30px;" />
+                    <div class = "food_inputname"  style="margin-bottom: 30px;" >
+                        음식 이름: <input type="text" id = "food_inputname" style="margin-left: 30px;" />
+                    </div>
+                </p>
+                <p>
+                    <div class = "food_inputcount"  style="margin-bottom: 30px;" >
+                        수량: <input type="text" id = "food_inputcount" style="margin-left: 30px; width: 50px; margin-right: 10px;" />
+                        개
+
                     </div>
                 </p>
                 <p>
                     <div class="container has-text-left" style="margin-bottom: 30px;" >
                         <div class="row">
                             유통 기한: 
-                            <div class = "select-year" style="margin-left: 30px;">
-                                <div class="dropdown">
-                                    <div class="dropdown-trigger">
-                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
-                                        <span>2024</span>
-                                        <span class="icon is-small">
-                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                        </span>
-                                        </button>
-                                    </div>
-                                    <div class="dropdown-menu" id="dropdown-menu3" role="menu">
-                                        <div class="dropdown-content">
-                                        <a href="#" class="dropdown-item">
-                                            Overview
-                                        </a>
-                                        
-                                        </div>
-                                    </div>
+                            <div class = "select-year"  style="margin-left: 30px;">
+                                <div class="select is-info is-rounded is-small">
+                                    <select id = "yearSelect">
+                                        {% for year in yearlist %}
+                                            <option> {{ year }} </option>
+                                        {% endfor %}           
+                                    
+                                    </select>
                                 </div>
                                 년
                             </div>
                             <div class = "select-month" style="margin-left: 20px;">
-                                <div class="dropdown">
-                                    <div class="dropdown-trigger">
-                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
-                                        <span>01</span>
-                                        <span class="icon is-small">
-                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                        </span>
-                                        </button>
-                                    </div>
-                                    <div class="dropdown-menu" id="dropdown-menu3" role="menu">
-                                        <div class="dropdown-content">
-                                        <a href="#" class="dropdown-item">
-                                            Overview
-                                        </a>
-                                        </div>
-                                    </div>
+                                <div class="select is-info  is-rounded is-small">
+                                    <select  id = "monthSelect">
+                                        {% for month in monthlist %}
+                                            <option> {{ month }} </option>
+                                        {% endfor %}           
+                                    </select>
                                 </div>
+                                
                                 월
                             </div>
                             <div class = "select-day" style="margin-left: 20px;">
-                                <div class="dropdown">
-                                    <div class="dropdown-trigger">
-                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
-                                        <span>01</span>
-                                        <span class="icon is-small">
-                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                        </span>
-                                        </button>
-                                    </div>
-                                    <div class="dropdown-menu" id="dropdown-menu3" role="menu">
-                                        <div class="dropdown-content">
-                                        <a href="#" class="dropdown-item">
-                                            Overview
-                                        </a>
-                                        </div>
-                                    </div>
+                                <div class="select is-info  is-rounded is-small">
+                                    <select  id = "daySelect">
+                                        {% for day in daylist %}
+                                            <option> {{ day }} </option>
+                                        {% endfor %}           
+                                    </select>
                                 </div>
                                 일
                             </div>
@@ -238,7 +301,7 @@
 
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <button class="btn btn-btn btn-secondary" type="button" style = "margin-right: 30px;">취소하기</button>
-                    <button class="btn btn-primary me-md-2" type="button">등록하기</button>
+                    <button class="btn btn-primary me-md-2" type="button" onclick = "PostFoodInfo()">등록하기</button>
                 </div>
             
             </div>

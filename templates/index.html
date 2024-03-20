@@ -134,6 +134,7 @@
           let food = foods[i];
           let id = food["_id"];
           let food_name = food["food_name"];
+          let food_image = food["food_image"];
 
           let expiration_year = food["expiration_year"];
           let expiration_month = food["expiration_month"];
@@ -143,13 +144,13 @@
           let name = food["name"];
           let refrigerator_floor = food["refrigerator_floor"];
           let room_number = food["room_number"];
+          let memo = food["memo"];
+          console.log(memo);
 
           let cardContentHtml = `
                     <div class="card">
                         <img class="card-img-top"
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                            
-                            alt="Card image cap">
+                            src="./static/${food_image}"alt="Card image cap">
 
                         <div class="card-body">
                             <p class = "food-name"> 음식 이름: ${food_name}</p>
@@ -159,7 +160,7 @@
                             <p class="user-name">음식 개수: ${food_count}</p>
                             <p class="user-memo">메모: </p>
                             <div class="box" style= "background-color: rgb(211, 246, 255);">
-                                메모메모
+                                ${memo}
                             </div>
                             <button type="button" onclick="foodApply('${id}', '${refrigerator_floor}')" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
                         </div>
@@ -328,8 +329,9 @@
               <div class="card">
                 <img
                   class="card-img-top"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  src="./static/{{food.food_image}}"
                   alt="Card image cap"
+                />
                 />
                 <div class="card-body">
                   <p class="food-name">음식 이름: {{ food.food_name }}</p>
