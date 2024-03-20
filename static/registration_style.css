@@ -253,23 +253,6 @@ a.article, a.article:hover {
     color: rgb(48, 89, 252);
     margin-bottom: 20px;
 }
-
-#myfridge_btn {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 120px;
-    height: 50px;
-    border-width: 1.5px;
-    border-radius: 25px;
-}
-
-#registration_btn {
-    width: 120px;
-    height: 50px;
-    border-width: 1.5px;
-    border-radius: 25px;
-}
-
 .wrap-main {
     width: 700px;
     margin: 30px auto;

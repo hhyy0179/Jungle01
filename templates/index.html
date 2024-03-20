@@ -59,9 +59,15 @@
             // 현재 층을 나타내는 버튼의 텍스트 업데이트
             document.querySelector('.alert.alert-primary').textContent = floor + '층';
         }
+
         document.getElementById('current-floor-btn').textContent = floor + '층';
+
+        function ClickRegisterBtn() {
+            window.location.href = "/registration";
+        }
+
     </script>
-   
+
 
 </head>
 
@@ -118,7 +124,7 @@
                     </div>
                     <p> 등록한 음식: 0개 </p>
                     <button type="button" class="btn btn-outline-primary" id = "myfridge_btn" >마이냉장고</button>
-                    <button type="button" class="btn btn-primary" id = "registration_btn" >등록하기</button>
+                    <button type="button" class="btn btn-primary" id = "registration_btn" onclick="ClickRegisterBtn()">등록하기</button>
                     
                 </div>
                 <div class = "main-contents">

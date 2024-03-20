@@ -24,6 +24,7 @@ def home():
 def login():
     return render_template("signup.html")
 
+
 @app.route("/sign", methods=["POST"])  # 회원가입
 def join():
     # 사용자 정보 받아오기
@@ -90,10 +91,10 @@ def find():
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
         userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
-        print(userinfo)
+        #print(userinfo)
         floors = [i for i in range(1, 23)]
         roomnumber = int(userinfo.get("room", "1")) // 100
-        print(roomnumber)
+        #print(roomnumber)
         return render_template(
             "index.html",
             user_info=userinfo,
@@ -108,7 +109,6 @@ def find():
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
         return redirect(url_for("home"))
-
 
 # db에서 음식 정보 불러오기
 # @app.route("/list", methods=["GET"])
@@ -150,36 +150,88 @@ def show_foods():
     return foods
 
 
+#등록하기 페이지 불러오기
+@app.route("/registration")
+def load_registeration():
+
+    token_receive = request.cookies.get("mytoken")
+
+    try:
+        payload = jwt.decode(
+            token_receive, SECRET_KEY, algorithms=["HS256"]
+        )  # token디코딩합니다.
+        userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
+
+        yearlist = [i for i in range(2020, 2050)]
+        monthlist = [j for j in range(1,13)]
+        daylist = [k for k in range(1,32)]
+        
+    except jwt.exceptions.DecodeError:
+        flash("로그인 정보가 존재하지 않습니다.")
+        return redirect(url_for("index"))
+
+    return render_template("registration.html", user_info = userinfo, yearlist = yearlist, monthlist = monthlist, daylist = daylist)
+    
+
+
 # 음식 등록하기 api
 @app.route("/registration", methods=["POST"])
 def post_foods():
     # 클라이언트로부터 데이터를 받기
+
     userId_receive = request.form["userId_give"]
-    foodImage_receive = request.form["foodImage_give"]
-    foodName_receive = request.form["food_give"]
-    registrationDate_receive = request.form["registrationDate_give"]
-    expirationDate_receive = request.form["expirationDate_give"]
+    foodName_receive = request.form["foodname_give"]
+
+    # static 폴더에 저장될 파일 이름 생성하기
+    foodImage_receive = request.files["foodimage_give"]
+    filename = f'img-{foodName_receive}'
+
+    # 확장자 나누기
+    extension = foodImage_receive.filename.split('.')[-1]
+
+    # static 폴더에 저장
+    save_to = f'static/{filename}.{extension}'
+    foodImage_receive.save(save_to)
+
+
+    foodCount_receive = request.form["foodcount_give"]
+    currentyear_receive = request.form["currentyear_give"]
+    currentmonth_receive = request.form["currentmonth_give"]
+    currentday_receive = request.form["currentday_give"]
+    expirationyear_receive = request.form["expirationyear_give"]
+    expirationmonth_receive = request.form["expirationmonth_give"]
+    expirationday_receive = request.form["expirationday_give"]
     memo_receive = request.form["memo_give"]
 
-    user = db.refrigerator.find_one({"user_id": userId_receive})
+    user = db.users.find_one({'id': userId_receive})
+
 
     food = {
-        "user_id": userId_receive,
-        "pwd": user["pwd"],
-        "name": user["name"],
-        "room_number": user["room_number"],
-        "refrigerator_floor": user["refrigerator_floor"],
-        "registration_year": registrationDate_receive["year"],
-        "registration_month": registrationDate_receive["month"],
-        "registration_day": registrationDate_receive["day"],
-        "expiration_year": expirationDate_receive["year"],
-        "expiration_month": expirationDate_receive["month"],
-        "expiration_day": expirationDate_receive["day"],
-        "food_name": "우유",
-        "food_image": "우유 사진",
-        "food_count": 1,
+        "user_id": user['id'],
+        'pwd': user['pw'],
+        "name": user["name_give"],
+        "room_number": int(user["room"]),
+        "refrigerator_floor": int(user["room"][:-2]),
+        "registration_year": int(currentyear_receive),
+        "registration_month": int(currentmonth_receive),
+        "registration_day": int(currentday_receive),
+        "expiration_year": int(expirationyear_receive),
+        "expiration_month": int(expirationmonth_receive),
+        "expiration_day": int(expirationday_receive),
+        "food_name": foodName_receive,
+        "food_image": f'{filename}.{extension}',
+        "food_count": int(foodCount_receive),
+        "memo" : memo_receive
     }
 
+    db.refrigerator.insert_one(food)
+
+    return jsonify({'result': 'success'})
+    # if int(foodCount_receive) > 0:
+    #     #db.refrigerator.insert_one(food)
+        
+    # else:
+    #     return jsonify({'result': 'faliure'})
 
 # # 회원정보수정
 # @app.route("/mypage/edit", methods=["POST"])
