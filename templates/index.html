@@ -30,7 +30,10 @@
     />
 
     <!-- Our Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
 
     <!-- Font Awesome JS -->
     <script
@@ -75,47 +78,49 @@
       let sortMode = Sort.BY_DATE;
       let myfridgeMode = false;
 
-        $(document).ready(function () {
-            $('#sidebarCollapse').on('click', function () {
-                $('#sidebar').toggleClass('active');
-                $(this).toggleClass('active');
-            });
+      $(document).ready(function () {
+        $("#sidebarCollapse").on("click", function () {
+          $("#sidebar").toggleClass("active");
+          $(this).toggleClass("active");
         });
-
-     </script>
-    <script>
-        function changeFloorText(element) {
-            // 클릭된 요소에서 data-floor 속성 값 가져오기
-            var floor = element.getAttribute('data-floor');
-            // 현재 층을 나타내는 버튼의 텍스트 업데이트
-            document.querySelector('.btn.btn-outline-primary').textContent = floor + '층';
-        }
-        document.getElementById('current-floor-btn').textContent = floor + '층';
+      });
     </script>
-
-
-
-</head>
+    <script>
+      function changeFloorText(element) {
+        // 클릭된 요소에서 data-floor 속성 값 가져오기
+        var floor = element.getAttribute("data-floor");
+        // 현재 층을 나타내는 버튼의 텍스트 업데이트
+        document.querySelector(".btn.btn-outline-primary").textContent =
+          floor + "층";
+      }
+      document.getElementById("current-floor-btn").textContent = floor + "층";
+    </script>
+  </head>
 
   <body>
     <div class="wrapper">
+      <!-- Sidebar Holder -->
+      <nav id="sidebar">
+        <div class="sidebar-header">
+          <h3>모두의 냉장고</h3>
+        </div>
 
-        <!-- Sidebar Holder -->
-        <nav id="sidebar">
-            <div class="sidebar-header">
-                <h3>모두의 냉장고</h3>
-            </div>
-    
-            <ul class="list-unstyled components">
-                <p>층별 선택</p>
-                <div>
-                    {% for floor in floors %}
-                    <li><a href="#" data-floor="{{ floor }}" onclick="changeFloorText(this);">{{ floor }}층</a></li>
-                    {% endfor %}                  
-                </div>
-
-            </ul>
-        </nav>
+        <ul class="list-unstyled components">
+          <p>층별 선택</p>
+          <div>
+            {% for floor in floors %}
+            <li>
+              <a
+                href="#"
+                data-floor="{{ floor }}"
+                onclick="changeFloorText(this);"
+                >{{ floor }}층</a
+              >
+            </li>
+            {% endfor %}
+          </div>
+        </ul>
+      </nav>
 
       <!-- Page Content Holder -->
       <div id="content">
@@ -127,45 +132,61 @@
               <span></span>
             </button>
 
-                    <p>모두의 냉장고</p>
+            <p>모두의 냉장고</p>
 
-                    <button type="button" class="btn btn-outline-primary" id="current-floor-btn">{{ roomnumber }}층</button>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              id="current-floor-btn"
+            >
+              {{ roomnumber }}층
+            </button>
+          </div>
+        </nav>
 
+        <div class="wrap-main">
+          <div class="user-contents">
+            <div class="circle-box" style="background: #bdbdbd">
+              <img
+                class="profile"
+                src="https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800"
+              />
+            </div>
+            <h4>안녕하세요 {{user_info.name_give}}님!</h4>
+            <h3>{{user_info.room}}호</h3>
+            <p>등록한 음식: 0개</p>
 
-                   
-                </div>
-            </nav>
-
-            <div class ="wrap-main">
-                <div class = "user-contents" >
-                    <div class="circle-box" style="background: #BDBDBD;">
-                        <img class="profile" src="https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800">
-                    </div>
-                    <h4> 안녕하세요 {{user_info.name_give}}님!</h4>
-                    <h3> {{user_info.room}}호 </h3>
-                    <p> 등록한 음식: 0개 </p>
- 
-                    <button type="button" class="btn btn-outline-primary" id = "myfridge">마이냉장고</button>
-                    <a class="btn btn-primary btn-lg" href="#" role="button" id="btn-posting-box"> 등록하기 </a>
-                </div>
-                <div class = "main-contents">
-                    <div class="tabs">
-                        <ul>
-                          <li class="is-active"><a>최신순</a></li>
-                          <li><a>유통기한 낮은순</a></li>
-                          <li><a>개수 적은순</a></li>
-                        </ul>
-                    </div>
-                    <p> 
-                        <div id="cards-box" class="card-columns">
-                            <div class="card">
-                                <img class="card-img-top"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                                    
-                                    alt="Card image cap">
+            <button type="button" class="btn btn-outline-primary" id="myfridge">
+              마이냉장고
+            </button>
+            <a
+              class="btn btn-primary btn-lg"
+              href="#"
+              role="button"
+              id="btn-posting-box"
+            >
+              등록하기
+            </a>
+          </div>
+          <div class="main-contents">
+            <div class="tabs">
+              <ul>
+                <li class="is-active"><a>최신순</a></li>
+                <li><a>유통기한 낮은순</a></li>
+                <li><a>개수 적은순</a></li>
+              </ul>
+            </div>
+            <p></p>
+            <div id="cards-box" class="card-columns">
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
 
                 <div class="card-body">
-                  <p class="food-name">음식 이름:</p>
+                  <p class="food-name">음식 이름: {{foodList['food_name']}}</p>
                   <p class="food-expiration">유통기한:</p>
                   <p class="user-addr">호수:</p>
                   <p class="user-name">주민이름:</p>
@@ -189,96 +210,131 @@
                   alt="Card image cap"
                 />
 
-                                <div class="card-body">
-                                    <p class = "food-name"> 음식 이름: </p>
-                                    <p class="food-expiration">유통기한: </p>
-                                    <p class="user-addr">호수:</p>
-                                    <p class="user-name">주민이름:</p>
-                                    <p class="user-memo">메모: </p>
-                                    <div class="box" style= "background-color: rgb(211, 246, 255);">
-                                        메모메모
-                                    </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription1">신청하기</button>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <img class="card-img-top"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                                    
-                                    alt="Card image cap">
-
-                                <div class="card-body">
-                                    <p class = "food-name"> 음식 이름: </p>
-                                    <p class="food-expiration">유통기한: </p>
-                                    <p class="user-addr">호수:</p>
-                                    <p class="user-name">주민이름:</p>
-                                    <p class="user-memo">메모: </p>
-                                    <div class="box" style= "background-color: rgb(211, 246, 255);">
-                                        메모메모
-                                    </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription2">신청하기</button>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <img class="card-img-top"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                                    
-                                    alt="Card image cap">
-
-                                <div class="card-body">
-                                    <p class = "food-name"> 음식 이름: </p>
-                                    <p class="food-expiration">유통기한: </p>
-                                    <p class="user-addr">호수:</p>
-                                    <p class="user-name">주민이름:</p>
-                                    <p class="user-memo">메모: </p>
-                                    <div class="box" style= "background-color: rgb(211, 246, 255);">
-                                        메모메모
-                                    </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription3">신청하기</button>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <img class="card-img-top"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                                    
-                                    alt="Card image cap">
-
-                                <div class="card-body">
-                                    <p class = "food-name"> 음식 이름: </p>
-                                    <p class="food-expiration">유통기한: </p>
-                                    <p class="user-addr">호수:</p>
-                                    <p class="user-name">주민이름:</p>
-                                    <p class="user-memo">메모: </p>
-                                    <div class="box" style= "background-color: rgb(211, 246, 255);">
-                                        메모메모
-                                    </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription4">신청하기</button>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <img class="card-img-top"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                                    
-                                    alt="Card image cap">
-
-                                <div class="card-body">
-                                    <p class = "food-name"> 음식 이름: </p>
-                                    <p class="food-expiration">유통기한: </p>
-                                    <p class="user-addr">호수:</p>
-                                    <p class="user-name">주민이름:</p>
-                                    <p class="user-memo">메모: </p>
-                                    <div class="box" style= "background-color: rgb(211, 246, 255);">
-                                        메모메모
-                                    </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
-                                </div>
-                            </div>
-                            
-                        </div>
-                    </p> 
-                </div>   
+                <div class="card-body">
+                  <p class="food-name">음식 이름: {{foodList['food_name']}}</p>
+                  <p class="food-expiration">
+                    유통기한:
+                    {{foodList['expiration_year']-foodList['expiration_month']-foodList['expiration_day']}}
+                  </p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription1"
+                  >
+                    신청하기
+                  </button>
                 </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription2"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription3"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription4"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+
+                <div class="card-body">
+                  <p class="food-name">음식 이름:</p>
+                  <p class="food-expiration">유통기한:</p>
+                  <p class="user-addr">호수:</p>
+                  <p class="user-name">주민이름:</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="subscription5"
+                  >
+                    신청하기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
   </body>
 </html>

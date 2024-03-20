@@ -17,7 +17,7 @@ app.secret_key = "your_very_secret_and_complex_key_here"
 from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
-db = client.dbweek0test
+db = client.dbrefrigerator
 
 
 ## HTML을 주는 부분
@@ -90,6 +90,7 @@ def api_login():
 
 @app.route("/index")  # 메인 페이지
 def find():
+    foodList = show_foods()
     token_receive = request.cookies.get("mytoken")
 
     try:
@@ -102,7 +103,11 @@ def find():
         roomnumber = int(userinfo.get("room", "1")) // 100
         print(roomnumber)
         return render_template(
-            "index.html", user_info=userinfo, floors=floors, roomnumber=roomnumber
+            "index.html",
+            user_info=userinfo,
+            floors=floors,
+            roomnumber=roomnumber,
+            foodList=foodList,
         )
 
     except jwt.ExpiredSignatureError:
@@ -111,6 +116,77 @@ def find():
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
         return redirect(url_for("home"))
+
+
+# db에서 음식 정보 불러오기
+# @app.route("/list", methods=["GET"])
+def show_foods():
+    # client 에서 요청한 정렬 방식이 있는지를 확인합니다. 없다면 기본으로 최신 순으로 정렬합니다.
+    sortMode = request.args.get("sortMode", "latest")
+
+    # db에 있는 음식 주어진 정렬 방식으로 정렬
+    # 최신 순
+    if sortMode == "latest":
+        foods = list(db.refrigerator.find({}))
+        print(foods)
+        foods = sorted(
+            foods,
+            key=lambda x: (
+                x["registration_year"],
+                x["registration_month"],
+                x["registration_day"],
+            ),
+            reverse=True,
+        )
+    # 유통기한 낮은 순
+    elif sortMode == "expiration_date":
+        foods = list(db.refrigerator.find({}))
+        foods = sorted(
+            foods,
+            key=lambda x: (
+                x["registration_year"],
+                x["registration_month"],
+                x["registration_day"],
+            ),
+        )
+    # 개수 적은 순
+    elif sortMode == "food_count":
+        foods = list(db.refrigerator.find({}))
+        foods = sorted(foods, key=lambda x: x["food_count"])
+
+    # return render_template("index.html", foodList=foods)
+    return foods
+
+
+# 음식 등록하기 api
+@app.route("/registration", methods=["POST"])
+def post_foods():
+    # 클라이언트로부터 데이터를 받기
+    userId_receive = request.form["userId_give"]
+    foodImage_receive = request.form["foodImage_give"]
+    foodName_receive = request.form["food_give"]
+    registrationDate_receive = request.form["registrationDate_give"]
+    expirationDate_receive = request.form["expirationDate_give"]
+    memo_receive = request.form["memo_give"]
+
+    user = db.refrigerator.find_one({"user_id": userId_receive})
+
+    food = {
+        "user_id": userId_receive,
+        "pwd": user["pwd"],
+        "name": user["name"],
+        "room_number": user["room_number"],
+        "refrigerator_floor": user["refrigerator_floor"],
+        "registration_year": registrationDate_receive["year"],
+        "registration_month": registrationDate_receive["month"],
+        "registration_day": registrationDate_receive["day"],
+        "expiration_year": expirationDate_receive["year"],
+        "expiration_month": expirationDate_receive["month"],
+        "expiration_day": expirationDate_receive["day"],
+        "food_name": "우유",
+        "food_image": "우유 사진",
+        "food_count": 1,
+    }
 
 
 # # 회원정보수정
