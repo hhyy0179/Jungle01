@@ -89,7 +89,6 @@
           $("#sidebar").toggleClass("active");
           $(this).toggleClass("active");
         });
-        showFood();
       });
 
       function logout() {
@@ -102,7 +101,6 @@
           },
         });
       }
-      
 
       // window.onload = () => {
       //     const token = localStorage.getItem('mytoken');
@@ -113,29 +111,28 @@
       //     // 추가적으로, 서버에 토큰 유효성 검사 요청을 보내는 로직을 구현할 수도 있습니다.
       // };
 
-    //   function showFood() {
-    //     $("#cards-box").empty();
-    //     $.ajax({
-    //       type: "GET",
-    //       url: "/index/list",
-    //       data: { sortMode: sortMode },
-    //       success: function (response) {
-    //         if (response["result"] != "success") {
-    //           alert(sortMode + "순으로 음식 목록 받아오기 실패");
-    //           return;
-    //         }
-    //         alert("연결");
-    //         let foods = response["foods-list"];
-    //         addFoodCards(foods);
-    //       },
-    //     });
-    //   }
-
+      //   function showFood() {
+      //     $("#cards-box").empty();
+      //     $.ajax({
+      //       type: "GET",
+      //       url: "/index/list",
+      //       data: { sortMode: sortMode },
+      //       success: function (response) {
+      //         if (response["result"] != "success") {
+      //           alert(sortMode + "순으로 음식 목록 받아오기 실패");
+      //           return;
+      //         }
+      //         alert("연결");
+      //         let foods = response["foods-list"];
+      //         addFoodCards(foods);
+      //       },
+      //     });
+      //   }
 
       function addFoodCards(foods) {
         for (let i = 0; i < foods.length; i++) {
           let food = foods[i];
-
+          let id = food["_id"];
           let food_name = food["food_name"];
 
           let expiration_year = food["expiration_year"];
@@ -159,11 +156,12 @@
                             <p class="food-expiration">유통기한: ${expiration_year}.${expiration_month}.${expiration_day}</p>
                             <p class="user-addr">호수: ${room_number}</p>
                             <p class="user-name">주민이름: ${name}</p>
+                            <p class="user-name">음식 개수: ${food_count}</p>
                             <p class="user-memo">메모: </p>
                             <div class="box" style= "background-color: rgb(211, 246, 255);">
                                 메모메모
                             </div>
-                            <button type="button" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
+                            <button type="button" onclick="foodApply('${id}', '${refrigerator_floor}')" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
                         </div>
                     </div>
                 `;
@@ -177,24 +175,45 @@
         // 현재 층을 나타내는 버튼의 텍스트 업데이트
         document.querySelector(".alert.alert-primary").textContent =
           floor + "층";
+        showFood(floor);
+      }
 
+      function showFood(floor) {
         $("#cards-box").empty();
         $.ajax({
           type: "GET",
           url: "/index/list",
-          data: { floor: floor},
+          data: { floor: floor },
           success: function (response) {
             if (response["result"] != "success") {
               alert(floor + "음식 목록 받아오기 실패");
               return;
             }
-            alert("연결");
             let foods = response["foods-list"];
             addFoodCards(foods);
           },
         });
       }
       // document.getElementById('current-floor-btn').textContent = floor + '층';
+
+      function foodApply(foodId, floor) {
+        console.log(foodId);
+        $.ajax({
+          type: "POST",
+          url: "/api/apply",
+          data: {
+            apply_foodid_give: foodId,
+          },
+          success: function (response) {
+            if (response["result"] == "success") {
+              alert("신청하기 완료!");
+              showFood(floor);
+            } else {
+              alert("신청하기 실패ㅠㅠ");
+            }
+          },
+        });
+      }
     </script>
   </head>
 
@@ -204,6 +223,7 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
+
     <div class="wrapper">
       <!-- Sidebar Holder -->
       <nav id="sidebar">
@@ -219,7 +239,7 @@
               <a
                 href="#"
                 data-floor="{{ floor }}"
-                onclick="changeFloorText(this); floorLoad(this)"
+                onclick="changeFloorText(this);"
                 >{{ floor }}층</a
               >
             </li>
@@ -301,34 +321,47 @@
                 <li><a>개수 적은순</a></li>
               </ul>
             </div>
-            <p>
-              <div id="cards-box" class="card-columns">
-                {% for food in foods %}
-                            <div class="card">
-                                <img class="card-img-top"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                                    
-                                    alt="Card image cap">
-
-                                <div class="card-body">
-                                    <p class = "food-name"> 음식 이름: {{ food.food_name }}</p>
-                                    <p class="food-expiration">유통기한: {{ food.expiration_year }}.{{ food.expiration_month }}.{{ food.expiration_day }}</p>
-                                    <p class="user-addr">호수: {{ food.room_number }}</p>
-                                    <p class="user-name">주민이름: {{ food.name }}</p>
-                                    <p class="user-memo">메모: </p>
-                                    <div class="box" style= "background-color: rgb(211, 246, 255);">
-                                        메모메모
-                                    </div>
-                                    <button type="button" class="btn btn-outline-primary" id = "subscription5">신청하기</button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                            
+            <p></p>
+            <!-- cards-box -->
+            <div id="cards-box" class="card-columns">
+              {% for food in foods %}
+              <div class="card">
+                <img
+                  class="card-img-top"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
+                  alt="Card image cap"
+                />
+                <div class="card-body">
+                  <p class="food-name">음식 이름: {{ food.food_name }}</p>
+                  <p class="food-expiration">
+                    유통기한: {{ food.expiration_year }}.{{
+                    food.expiration_month }}.{{ food.expiration_day }}
+                  </p>
+                  <p class="user-addr">호수: {{ food.room_number }}</p>
+                  <p class="user-name">주민이름: {{ food.name }}</p>
+                  <p class="user-name">음식 개수: {{ food.food_count }}</p>
+                  <p class="user-memo">메모:</p>
+                  <div class="box" style="background-color: rgb(211, 246, 255)">
+                    메모메모
+                  </div>
+                  <button
+                    type="button"
+                    onclick="foodApply('{{food._id}}', '{{food.refrigerator_floor}}')"
+                    class="btn btn-outline-primary"
+                    id="subscription5"
+                  >
+                    신청하기
+                  </button>
                 </div>
-            </p>
+              </div>
+              {% endfor %}
+            </div>
+            <!-- cards-box -->
           </div>
         </div>
       </div>
+      <!-- 페이지 컨텐츠 -->
     </div>
+    <!-- div wrraper -->
   </body>
 </html>
