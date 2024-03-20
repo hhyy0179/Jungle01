@@ -9,14 +9,14 @@ db = client.dbrefrigerator  # 'dbrefrigerator'라는 이름의 db를 만듭니�
 def insert_all():
 
     doc = {
-        "user_id": "user1",
+        "user_id": "user4",
         "pwd": "test123",
-        "name": "김회일",
+        "name": "김회일1",
         "room_number": 426,
         "refrigerator_floor": 4,
         "registration_year": 2024,
         "registration_month": 3,
-        "registration_day": 19,
+        "registration_day": 20,
         "expiration_year": 2024,
         "expiration_month": 3,
         "expiration_day": 30,
@@ -27,13 +27,13 @@ def insert_all():
     db.refrigerator.insert_one(doc)
 
     doc = {
-        "user_id": "user2",
+        "user_id": "user5",
         "pwd": "test1234",
-        "name": "김철수",
-        "room_number": 125,
-        "refrigerator_floor": 1,
+        "name": "김철수2",
+        "room_number": 425,
+        "refrigerator_floor": 4,
         "registration_year": 2024,
-        "registration_month": 3,
+        "registration_month": 4,
         "registration_day": 18,
         "expiration_year": 2024,
         "expiration_month": 3,
@@ -45,17 +45,17 @@ def insert_all():
     db.refrigerator.insert_one(doc)
 
     doc = {
-        "user_id": "user3",
+        "user_id": "user6",
         "pwd": "test12345",
-        "name": "김영희",
-        "room_number": 526,
-        "refrigerator_floor": 5,
+        "name": "김영희3",
+        "room_number": 426,
+        "refrigerator_floor": 4,
         "registration_year": 2024,
         "registration_month": 3,
         "registration_day": 17,
         "expiration_year": 2024,
         "expiration_month": 3,
-        "expiration_day": 31,
+        "expiration_day": 1,
         "food_name": "우유",
         "food_image": "우유 사진",
         "food_count": 1,
@@ -67,7 +67,7 @@ def insert_all():
 
 if __name__ == "__main__":
     # 기존의 refrigerator 콜렉션을 삭제하기
-    db.refrigerator.drop()
+    # db.refrigerator.drop()
 
     # 영화 사이트를 scraping 해서 db 에 채우기
     insert_all()

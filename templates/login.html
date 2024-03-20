@@ -50,9 +50,9 @@
     }
   </style>
   <script>
-    window.onload = () => {
-      localStorage.removeItem("mytoken"); // 토큰 삭제
-    };
+    // window.onload = () => {
+    //   localStorage.removeItem("mytoken"); // 토큰 삭제
+    // };
     function login() {
       $.ajax({
         type: "POST",
@@ -64,7 +64,7 @@
         success: function (response) {
           console.log(response);
           if (response["result"] == "success") {
-            localStorage.setItem("mytoken", response["token"]);
+            $.cookie("mytoken", response["token"]);
             alert("로그인 되었습니다!");
             window.location.href = "/index";
           } else {
