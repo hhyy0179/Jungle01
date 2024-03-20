@@ -332,7 +332,6 @@
                   src="./static/{{food.food_image}}"
                   alt="Card image cap"
                 />
-                />
                 <div class="card-body">
                   <p class="food-name">음식 이름: {{ food.food_name }}</p>
                   <p class="food-expiration">
@@ -344,7 +343,7 @@
                   <p class="user-name">음식 개수: {{ food.food_count }}</p>
                   <p class="user-memo">메모:</p>
                   <div class="box" style="background-color: rgb(211, 246, 255)">
-                    메모메모
+                    {{food.memo}}
                   </div>
                   <button
                     type="button"

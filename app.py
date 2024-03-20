@@ -73,7 +73,7 @@ def join():
     room_recieve = int(request.form["room_give"])
     count_recieve = request.form["count_give"]
 
-    result = db.users.find_one({"id": id_recieve})
+    result = db.users.find_one({"user_id": id_recieve})
 
     if name_recieve == "":
         return jsonify({"result": "fail", "msg": "이름을 입력하세요"})
