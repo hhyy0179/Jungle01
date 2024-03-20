@@ -81,7 +81,7 @@
         BY_COUNT: "count",
       };
 
-      let sortMode = Sort.BY_EXPIRATION;
+      let sortMode = Sort.BY_DATE;
       let myfridgeMode = false;
       var floor;
       var userinfo = "{{user_info['room_number']}}";
@@ -92,6 +92,7 @@
           $("#sidebar").toggleClass("active");
           $(this).toggleClass("active");
         });
+        displaySorter();
       });
 
       function logout() {
