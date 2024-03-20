@@ -88,11 +88,10 @@ def api_login():
         return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 틀렸습니다."})
 
 
-@app.route("/index")  # 메인 페이지
+@app.route("/index", methods=["GET"])  # 메인 페이지
 def find():
-    foodList = show_foods()
     token_receive = request.cookies.get("mytoken")
-
+    foodList = show_foods()
     try:
         payload = jwt.decode(
             token_receive, SECRET_KEY, algorithms=["HS256"]
@@ -101,13 +100,17 @@ def find():
         print(userinfo)
         floors = [i for i in range(1, 23)]
         roomnumber = int(userinfo.get("room", "1")) // 100
+        floor = request.args.get("floorNum", roomnumber)
         print(roomnumber)
+        print(floor)
+
         return render_template(
             "index.html",
             user_info=userinfo,
             floors=floors,
             roomnumber=roomnumber,
             foodList=foodList,
+            floor=floor,
         )
 
     except jwt.ExpiredSignatureError:
@@ -119,16 +122,15 @@ def find():
 
 
 # db에서 음식 정보 불러오기
-# @app.route("/list", methods=["GET"])
+# @app.route("/index/list/sort", methods=["GET"])
 def show_foods():
     # client 에서 요청한 정렬 방식이 있는지를 확인합니다. 없다면 기본으로 최신 순으로 정렬합니다.
-    sortMode = request.args.get("sortMode", "latest")
+    sortMode = "expiration"
 
     # db에 있는 음식 주어진 정렬 방식으로 정렬
     # 최신 순
     if sortMode == "latest":
         foods = list(db.refrigerator.find({}))
-        print(foods)
         foods = sorted(
             foods,
             key=lambda x: (
@@ -136,25 +138,24 @@ def show_foods():
                 x["registration_month"],
                 x["registration_day"],
             ),
-            reverse=True,
+            # reverse=True,
         )
     # 유통기한 낮은 순
-    elif sortMode == "expiration_date":
+    elif sortMode == "expiration":
         foods = list(db.refrigerator.find({}))
         foods = sorted(
             foods,
             key=lambda x: (
-                x["registration_year"],
-                x["registration_month"],
-                x["registration_day"],
+                x["expiration_year"],
+                x["expiration_month"],
+                x["expiration_day"],
             ),
         )
     # 개수 적은 순
-    elif sortMode == "food_count":
+    elif sortMode == "count":
         foods = list(db.refrigerator.find({}))
         foods = sorted(foods, key=lambda x: x["food_count"])
 
-    # return render_template("index.html", foodList=foods)
     return foods
 
 

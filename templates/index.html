@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <title>모두의 냉장고</title>
+    <!-- ajax -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Bootstrap CSS CDN -->
     <link
@@ -50,11 +52,12 @@
     ></script>
 
     <!-- jQuery CDN - Slim version (=without AJAX) -->
-    <script
+    <!-- <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
+
     <!-- Popper.JS -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
@@ -70,7 +73,7 @@
 
     <script type="text/javascript">
       const Sort = {
-        BY_DATE: "recentdate",
+        BY_DATE: "latest",
         BY_EXPIRATION: "expiration",
         BY_COUNT: "count",
       };
@@ -86,18 +89,41 @@
       });
     </script>
     <script>
+      var floor = 0;
       function changeFloorText(element) {
         // 클릭된 요소에서 data-floor 속성 값 가져오기
-        var floor = element.getAttribute("data-floor");
+        floor = element.getAttribute("data-floor");
         // 현재 층을 나타내는 버튼의 텍스트 업데이트
         document.querySelector(".btn.btn-outline-primary").textContent =
           floor + "층";
       }
-      document.getElementById("current-floor-btn").textContent = floor + "층";
+      // document.getElementById("current-floor-btn").textContent = floor + "층";
+
+      // 층별로 냉장고 음식 불러오기
+      function floorLoad(element) {
+        let floor = element.getAttribute("data-floor");
+        console.log(floor);
+        $.ajax({
+          type: "GET",
+          url: "/index",
+          data: { floorNum: floor },
+          error: function (xhr, status, error) {
+            alert("에러 발생");
+          },
+          success: function (response) {
+            alert(response.floorn);
+          },
+        });
+      }
     </script>
   </head>
 
   <body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
     <div class="wrapper">
       <!-- Sidebar Holder -->
       <nav id="sidebar">
@@ -113,7 +139,7 @@
               <a
                 href="#"
                 data-floor="{{ floor }}"
-                onclick="changeFloorText(this);"
+                onclick="changeFloorText(this); floorLoad(this)"
                 >{{ floor }}층</a
               >
             </li>
@@ -177,160 +203,79 @@
               </ul>
             </div>
             <p></p>
+
             <div id="cards-box" class="card-columns">
+              {% for item in foodList %} {% if item['refrigerator_floor'] ==
+              floor %}
               <div class="card">
                 <img
                   class="card-img-top"
                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
                   alt="Card image cap"
                 />
-
                 <div class="card-body">
-                  <p class="food-name">음식 이름: {{foodList['food_name']}}</p>
-                  <p class="food-expiration">유통기한:</p>
-                  <p class="user-addr">호수:</p>
-                  <p class="user-name">주민이름:</p>
+                  <p class="food-name">음식 이름: {{item['food_name']}}</p>
+                  <p class="food-expiration">
+                    유통기한:
+                    {{item['expiration_year']}}-{{item['expiration_month']}}-{{item['expiration_day']}}
+                  </p>
+                  <p class="user-addr">호수: {{item['room_number']}}</p>
+                  <p class="user-name">주인이름: {{item['name']}}</p>
+                  <p class="user-name">음식 개수: {{item['food_count']}}</p>
                   <p class="user-memo">메모:</p>
                   <div class="box" style="background-color: rgb(211, 246, 255)">
-                    메모메모
+                    {{item['memo']}}
                   </div>
                   <button
                     type="button"
                     class="btn btn-outline-primary"
                     id="subscription"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
                   >
                     신청하기
                   </button>
-                </div>
-              </div>
-              <div class="card">
-                <img
-                  class="card-img-top"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                  alt="Card image cap"
-                />
 
-                <div class="card-body">
-                  <p class="food-name">음식 이름: {{foodList['food_name']}}</p>
-                  <p class="food-expiration">
-                    유통기한:
-                    {{foodList['expiration_year']-foodList['expiration_month']-foodList['expiration_day']}}
-                  </p>
-                  <p class="user-addr">호수:</p>
-                  <p class="user-name">주민이름:</p>
-                  <p class="user-memo">메모:</p>
-                  <div class="box" style="background-color: rgb(211, 246, 255)">
-                    메모메모
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    id="subscription1"
+                  <!-- 모달 -->
+                  <div
+                    class="modal fade"
+                    id="exampleModal"
+                    tabindex="-1"
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true"
                   >
-                    신청하기
-                  </button>
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="exampleModalLabel">
+                            Modal title
+                          </h1>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div class="modal-body">...</div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Close
+                          </button>
+                          <button type="button" class="btn btn-primary">
+                            Save changes
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="card">
-                <img
-                  class="card-img-top"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                  alt="Card image cap"
-                />
-
-                <div class="card-body">
-                  <p class="food-name">음식 이름:</p>
-                  <p class="food-expiration">유통기한:</p>
-                  <p class="user-addr">호수:</p>
-                  <p class="user-name">주민이름:</p>
-                  <p class="user-memo">메모:</p>
-                  <div class="box" style="background-color: rgb(211, 246, 255)">
-                    메모메모
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    id="subscription2"
-                  >
-                    신청하기
-                  </button>
-                </div>
-              </div>
-              <div class="card">
-                <img
-                  class="card-img-top"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                  alt="Card image cap"
-                />
-
-                <div class="card-body">
-                  <p class="food-name">음식 이름:</p>
-                  <p class="food-expiration">유통기한:</p>
-                  <p class="user-addr">호수:</p>
-                  <p class="user-name">주민이름:</p>
-                  <p class="user-memo">메모:</p>
-                  <div class="box" style="background-color: rgb(211, 246, 255)">
-                    메모메모
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    id="subscription3"
-                  >
-                    신청하기
-                  </button>
-                </div>
-              </div>
-              <div class="card">
-                <img
-                  class="card-img-top"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                  alt="Card image cap"
-                />
-
-                <div class="card-body">
-                  <p class="food-name">음식 이름:</p>
-                  <p class="food-expiration">유통기한:</p>
-                  <p class="user-addr">호수:</p>
-                  <p class="user-name">주민이름:</p>
-                  <p class="user-memo">메모:</p>
-                  <div class="box" style="background-color: rgb(211, 246, 255)">
-                    메모메모
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    id="subscription4"
-                  >
-                    신청하기
-                  </button>
-                </div>
-              </div>
-              <div class="card">
-                <img
-                  class="card-img-top"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe6s4H678KM0NnP0XlHJQw6T-8AwzIAxUBmA&usqp=CAU"
-                  alt="Card image cap"
-                />
-
-                <div class="card-body">
-                  <p class="food-name">음식 이름:</p>
-                  <p class="food-expiration">유통기한:</p>
-                  <p class="user-addr">호수:</p>
-                  <p class="user-name">주민이름:</p>
-                  <p class="user-memo">메모:</p>
-                  <div class="box" style="background-color: rgb(211, 246, 255)">
-                    메모메모
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    id="subscription5"
-                  >
-                    신청하기
-                  </button>
-                </div>
-              </div>
+              {% endif %} {% endfor %}
             </div>
           </div>
         </div>
