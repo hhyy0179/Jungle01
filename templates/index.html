@@ -105,7 +105,7 @@
           },
         });
       }
-
+      
       // window.onload = () => {
       //     const token = localStorage.getItem('mytoken');
       //     if (!token) {
@@ -199,6 +199,27 @@
           },
         });
       }
+
+      function LoadMyFridge() {
+        $.ajax({
+          type: "GET",
+          url: "/myfridge",
+          success: function (response) {
+            window.location.href = "/myfridge";
+          }
+        });
+      }
+
+      function LoadRegistration() {
+        $.ajax({
+          type: "GET",
+          url: "/registration",
+          success: function (response) {
+            window.location.href = "/registration";
+          }
+        });
+      }
+
       // document.getElementById('current-floor-btn').textContent = floor + '층';
 
       // 신청하기 함수
@@ -294,21 +315,10 @@
               class="alert alert-primary"
               role="alert"
               id="current-floor-btn"
-              style="width: 80px; text-align: center"
-            >
+              style="width: 80px; text-align: center">
               {{ roomFloor }}층
             </div>
-            <div>
-              <button
-                type="button"
-                class="btn btn-danger alert-danger"
-                id="logout-btn"
-                style="width: 80px; text-align: center"
-                onclick="logout()"
-              >
-                logout
-              </button>
-            </div>
+            
           </div>
         </nav>
 
@@ -333,15 +343,27 @@
               type="button"
               class="btn btn-outline-primary"
               id="myfridge_btn"
+              onclick="LoadMyFridge()"
             >
               마이냉장고
             </button>
-            <a
-              href="/registration"
+            <button
+              type="button"
               class="btn btn-primary"
               id="registration_btn"
-              >등록하기</a
-            >
+              onclick="LoadRegistration()"
+              >등록하기</button>
+              <div>
+                <button
+                  type="button"
+                  class="btn btn-danger alert-danger"
+                  id="logout-btn"
+                  style="width:70px; text-align: center; margin-top: 20px; font-size: small;"
+                  onclick="logout()"
+                >
+                  logout
+                </button>
+              </div>
           </div>
           <div class="main-contents">
             <div class="tabs">

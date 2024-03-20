@@ -17,12 +17,14 @@ import hashlib
 from datetime import datetime, timezone, timedelta
 
 app = Flask(__name__)
+
 SECRET_KEY = "REDSEVEN"
 app.secret_key = "your_very_secret_and_complex_key_here"
 
 from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
+#client = MongoClient('mongodb://test:test@13.125.17.72',27017)
 # client = MongoClient("mongodb://test:test@43.200.173.147", 27017)
 db = client.dbrefrigerator
 
@@ -31,6 +33,7 @@ db = client.dbrefrigerator
 # ObjectId 타입으로 되어있는 _id 필드는 Flask 의 jsonify 호출시 문제가 된다.
 # 이를 처리하기 위해서 기본 JsonEncoder 가 아닌 custom encoder 를 사용한다.
 # Custom encoder 는 다른 부분은 모두 기본 encoder 에 동작을 위임하고 ObjectId 타입만 직접 처리한다.
+
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -297,9 +300,6 @@ def post_foods():
     user = db.users.find_one({"user_id": userId_receive})
     new_regi = user["regi_count"] + 1
 
-    print("---asasd-")
-    print(userId_receive)
-    print("--dsasds--")
 
     food = {
         "user_id": user["user_id"],
@@ -360,36 +360,56 @@ def apply():
             return jsonify({"result": "failure"})
 
 
-# # 음식 등록하기 api
-# @app.route("/registration", methods=["POST"])
-# def post_foods():
-#     # 클라이언트로부터 데이터를 받기
-#     userId_receive = request.form["userId_give"]
-#     foodImage_receive = request.form["foodImage_give"]
-#     foodName_receive = request.form["food_give"]
-#     registrationDate_receive = request.form["registrationDate_give"]
-#     expirationDate_receive = request.form["expirationDate_give"]
-#     memo_receive = request.form["memo_give"]
+#마이냉장고 페이지 불러오기
+@app.route("/myfridge")
+def load_myfridge():
+    token_receive = request.cookies.get("mytoken")
 
-#     user = db.refrigerator.find_one({"user_id": userId_receive})
+    try:
+        payload = jwt.decode(
+            token_receive, SECRET_KEY, algorithms=["HS256"]
+        )  # token디코딩합니다.
+        userinfo = db.users.find_one({"user_id": payload["user_id"]})
 
-#     food = {
-#         "user_id": userId_receive,
-#         "pwd": user["pwd"],
-#         "name": user["name"],
-#         "room_number": user["room_number"],
-#         "refrigerator_floor": user["refrigerator_floor"],
-#         "registration_year": registrationDate_receive["year"],
-#         "registration_month": registrationDate_receive["month"],
-#         "registration_day": registrationDate_receive["day"],
-#         "expiration_year": expirationDate_receive["year"],
-#         "expiration_month": expirationDate_receive["month"],
-#         "expiration_day": expirationDate_receive["day"],
-#         "food_name": "우유",
-#         "food_image": "우유 사진",
-#         "food_count": 1,
-#     }
+        print(userinfo)
+
+    except jwt.exceptions.DecodeError:
+        flash("로그인 정보가 존재하지 않습니다.")
+        return redirect(url_for("index"))
+
+    return render_template("myfridge.html", user_info = userinfo)
+
+
+#개인 포스팅 불러오기
+@app.route('/myfridge/list')
+def show_userpost():
+    token_receive = request.cookies.get("mytoken")
+
+    try:
+        payload = jwt.decode(
+            token_receive, SECRET_KEY, algorithms=["HS256"]
+        )  # token디코딩합니다.
+        userinfos = list(db.refrigerator.find({"user_id": payload["user_id"]}))
+    
+    
+    except jwt.exceptions.DecodeError:
+        flash("로그인 정보가 존재하지 않습니다.")
+        return redirect(url_for("index"))
+
+    return jsonify({'result': 'success', 'user_infos': userinfos})
+
+
+#개인 포스팅 불러오기
+@app.route('/myfridge/delete', methods=['POST'])
+def delete_userpost():
+    # client 에서 작성한 음식 이름을 가져온다.
+    delete_receive = request.form['post_give']
+    
+    result = db.refrigerator.delete_one({'_id' : ObjectId(delete_receive)})
+
+    if result.deleted_count == 1:
+        return jsonify({'result': 'success'})
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=5000, debug=True)
+    app.run("0.0.0.0", port=5001, debug=True)
