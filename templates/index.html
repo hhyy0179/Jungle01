@@ -53,13 +53,27 @@
             });
         });
 
+        window.onload = () => {
+            const token = localStorage.getItem('mytoken');
+            if (!token) {
+                // 토큰이 없거나 유효하지 않으면 로그인 페이지로 리다이렉트
+                window.location.href = '/';
+            }
+            // 추가적으로, 서버에 토큰 유효성 검사 요청을 보내는 로직을 구현할 수도 있습니다.
+        };
+
+
         function changeFloorText(element) {
             // 클릭된 요소에서 data-floor 속성 값 가져오기
             var floor = element.getAttribute('data-floor');
             // 현재 층을 나타내는 버튼의 텍스트 업데이트
             document.querySelector('.alert.alert-primary').textContent = floor + '층';
         }
-        document.getElementById('current-floor-btn').textContent = floor + '층';
+        // document.getElementById('current-floor-btn').textContent = floor + '층';
+        function logout() {
+            localStorage.removeItem('mytoken'); // 토큰 삭제
+            window.location.href = "/"; // 로그인 페이지로 리다이렉트
+        }
     </script>
    
 
@@ -99,7 +113,10 @@
                     <p class = "title-top" > 모두의 냉장고</p>
 
                     <div class="alert alert-primary" role="alert" id="current-floor-btn" style="width: 80px; text-align: center;">
-                        {{ roomnumber }}층
+                        {{ roomFloor }}층
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-danger alert-danger" id="logout-btn" style="width: 80px; text-align: center;" onclick="logout()">logout</button>
                     </div>
                 </div>
             </nav>
@@ -115,10 +132,11 @@
                             {{user_info.name_give}}님!
                         </h4>
                         <h3> {{user_info.room}}호 </h3>
+                        <p style="font-size: 15px;"> 등록한 음식: {{user_info.count}}개 </p>
                     </div>
-                    <p> 등록한 음식: 0개 </p>
+
                     <button type="button" class="btn btn-outline-primary" id = "myfridge_btn" >마이냉장고</button>
-                    <button type="button" class="btn btn-primary" id = "registration_btn" >등록하기</button>
+                    <a href="/registration" class="btn btn-primary" id="registration_btn">등록하기</a>
                     
                 </div>
                 <div class = "main-contents">

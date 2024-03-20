@@ -24,6 +24,7 @@ def home():
 def login():
     return render_template("signup.html")
 
+
 @app.route("/sign", methods=["POST"])  # 회원가입
 def join():
     # 사용자 정보 받아오기
@@ -71,7 +72,7 @@ def api_login():
     if result is not None:
         # JWT 토큰 생성
         payload = {
-            "id": id_recieve, 
+            "id": id_recieve,
             "exp": datetime.now(timezone.utc) + timedelta(hours=2),
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
@@ -92,13 +93,12 @@ def find():
         userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
         print(userinfo)
         floors = [i for i in range(1, 23)]
-        roomnumber = int(userinfo.get("room", "1")) // 100
-        print(roomnumber)
+        roomFloor = int(userinfo.get("room", "1")) // 100
         return render_template(
             "index.html",
             user_info=userinfo,
             floors=floors,
-            roomnumber=roomnumber,
+            roomFloor=roomFloor,
             foodList=foodList,
         )
 
@@ -148,6 +148,11 @@ def show_foods():
 
     # return render_template("index.html", foodList=foods)
     return foods
+
+
+@app.route("/registration")
+def registration():
+    return render_template("registration.html")
 
 
 # 음식 등록하기 api
