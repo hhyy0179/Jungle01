@@ -107,7 +107,7 @@
 
         function PostFoodInfo() {
             var user_info =  JSON.parse('{{ user_info | tojson | safe }}');
-            let userid = user_info.id;
+            let userid = user_info.user_id;
             let foodname = $('#food_inputname').val()
             let foodcount = $('#food_inputcount').val()
 

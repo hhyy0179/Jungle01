@@ -179,7 +179,7 @@ def load_registeration():
         payload = jwt.decode(
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
-        userinfo = db.users.find_one({"id": payload["id"]}, {"_id": 0})
+        userinfo = db.users.find_one({"user_id": payload["user_id"]}, {"_id": 0})
 
         yearlist = [i for i in range(2020, 2050)]
         monthlist = [j for j in range(1,13)]
@@ -222,15 +222,19 @@ def post_foods():
     expirationday_receive = request.form["expirationday_give"]
     memo_receive = request.form["memo_give"]
 
-    user = db.users.find_one({'id': userId_receive})
+    user = db.users.find_one({'user_id': userId_receive})
 
 
+    print("---asasd-")
+    print(userId_receive)
+    print("--dsasds--")
+    
     food = {
-        "user_id": user['id'],
-        'pwd': user['pw'],
-        "name": user["name_give"],
-        "room_number": int(user["room"]),
-        "refrigerator_floor": int(user["room"][:-2]),
+        "user_id": user['user_id'],
+        'pwd': user['pwd'],
+        "name": user["name"],
+        "room_number": int(user["room_number"]),
+        "refrigerator_floor": int(user["room_number"][:-2]),
         "registration_year": int(currentyear_receive),
         "registration_month": int(currentmonth_receive),
         "registration_day": int(currentday_receive),
