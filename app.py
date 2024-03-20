@@ -17,6 +17,7 @@ import hashlib
 from datetime import datetime, timezone, timedelta
 
 app = Flask(__name__)
+
 SECRET_KEY = "REDSEVEN"
 app.secret_key = "your_very_secret_and_complex_key_here"
 
@@ -32,6 +33,7 @@ db = client.dbrefrigerator
 # ObjectId 타입으로 되어있는 _id 필드는 Flask 의 jsonify 호출시 문제가 된다.
 # 이를 처리하기 위해서 기본 JsonEncoder 가 아닌 custom encoder 를 사용한다.
 # Custom encoder 는 다른 부분은 모두 기본 encoder 에 동작을 위임하고 ObjectId 타입만 직접 처리한다.
+
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -298,9 +300,6 @@ def post_foods():
     user = db.users.find_one({"user_id": userId_receive})
     new_regi = user["regi_count"] + 1
 
-    print("---asasd-")
-    print(userId_receive)
-    print("--dsasds--")
 
     food = {
         "user_id": user["user_id"],
@@ -361,18 +360,6 @@ def apply():
             return jsonify({"result": "failure"})
 
 
-# # 음식 등록하기 api
-# @app.route("/registration", methods=["POST"])
-# def post_foods():
-#     # 클라이언트로부터 데이터를 받기
-#     userId_receive = request.form["userId_give"]
-#     foodImage_receive = request.form["foodImage_give"]
-#     foodName_receive = request.form["food_give"]
-#     registrationDate_receive = request.form["registrationDate_give"]
-#     expirationDate_receive = request.form["expirationDate_give"]
-#     memo_receive = request.form["memo_give"]
-
-
 #마이냉장고 페이지 불러오기
 @app.route("/myfridge")
 def load_myfridge():
@@ -382,7 +369,9 @@ def load_myfridge():
         payload = jwt.decode(
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
-        userinfo = db.users.find_one({"user_id": payload["user_id"]}, {"_id": 0})
+        userinfo = db.users.find_one({"user_id": payload["user_id"]})
+
+        print(userinfo)
 
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
@@ -400,8 +389,8 @@ def show_userpost():
         payload = jwt.decode(
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
-        userinfos = list(db.refrigerator.find({"user_id": payload["user_id"]}, {"_id": 0}))
-       
+        userinfos = list(db.refrigerator.find({"user_id": payload["user_id"]}))
+    
     
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
@@ -415,20 +404,12 @@ def show_userpost():
 def delete_userpost():
     # client 에서 작성한 음식 이름을 가져온다.
     delete_receive = request.form['post_give']
-
-    print("------")
-    print(delete_receive)
-    print("------")
     
-    result = db.refrigerator.delete_one({'food_name' : delete_receive})
+    result = db.refrigerator.delete_one({'_id' : ObjectId(delete_receive)})
+
     if result.deleted_count == 1:
         return jsonify({'result': 'success'})
 
-    
-    
-
-
-
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=5000, debug=True)
+    app.run("0.0.0.0", port=5001, debug=True)

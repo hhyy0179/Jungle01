@@ -80,11 +80,11 @@
             });
         }
 
-        function DeletePost(foodname) {
+        function DeletePost(foodid) {
             $.ajax({
                 type: "POST",
                 url: "/myfridge/delete",
-                data: {post_give: foodname},
+                data: {post_give: foodid},
                 success: function (response) {
                     if (response['result'] == 'success' ) {
                         alert('삭제 완료!')
@@ -97,9 +97,12 @@
         function addFoodCards(foods) {
         for (let i = 0; i < foods.length; i++) {
           let food = foods[i];
-
+        
+          let food_id = food["_id"];
           let food_name = food["food_name"];
           let food_image = food["food_image"];
+
+          console.log(food_id);
 
           let expiration_year = food["expiration_year"];
           let expiration_month = food["expiration_month"];
@@ -125,8 +128,8 @@
                             <div class="box" style= "background-color: rgb(211, 246, 255);">
                                 ${memo}
                             </div class="btn-group" style = "display: flex">
-                                <button type="button" class="btn btn-outline-primary" id = "editpost" onclick = "EditPost('${food_name}')">수정하기</button>
-                                <button type="button" class="btn btn-outline-primary" id = "deletepost" onclick = "DeletePost('${food_name}' )">삭제하기</button>
+                                <button type="button" class="btn btn-outline-primary" id = "editpost" onclick = "EditPost('${food_id}')">수정하기</button>
+                                <button type="button" class="btn btn-outline-primary" id = "deletepost" onclick = "DeletePost('${food_id}' )">삭제하기</button>
                             </div>
                     </div>
                 `;
