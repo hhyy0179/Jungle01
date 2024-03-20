@@ -147,7 +147,7 @@ def find():
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
         userinfo = db.refrigerator.find_one({"user_id": payload["user_id"]}, {"_id": 0})
-        # print(userinfo)
+        print(userinfo)
         floors = [i for i in range(1, 23)]
         roomFloor = int(userinfo.get("room_number", "1")) // 100
         foods = list(
@@ -195,16 +195,43 @@ def find():
 @app.route("/index/list", methods=["GET"])
 def show_foods():
     floor = request.args.get("floor")  # 클라이언트에서 요청한 층수
+    sortMode = request.args.get("sortMode")  # 정렬 모드
     print(floor)
+    print(sortMode)
 
     try:
         # 해당 층의 음식 정보만 필터링
-        foods_cursor = db.refrigerator.find(
-            {"food_count": {"$ne": 0}, "refrigerator_floor": int(floor)}
-        ).sort(
-            [("expiration_year", -1), ("expiration_month", -1), ("expiration_day", -1)]
-        )
-        foods = list(foods_cursor)
+        if sortMode == "expiration":
+            foods_cursor = db.refrigerator.find(
+                {"food_count": {"$ne": 0}, "refrigerator_floor": int(floor)}
+            ).sort(
+                [
+                    ("expiration_year", 1),
+                    ("expiration_month", 1),
+                    ("expiration_day", 1),
+                ]
+            )
+            foods = list(foods_cursor)
+        elif sortMode == "latest":
+            foods_cursor = db.refrigerator.find(
+                {"food_count": {"$ne": 0}, "refrigerator_floor": int(floor)}
+            ).sort(
+                [
+                    ("registration_year", -1),
+                    ("registration_month", -1),
+                    ("registration_day", -1),
+                ]
+            )
+            foods = list(foods_cursor)
+        elif sortMode == "count":
+            foods_cursor = db.refrigerator.find(
+                {"food_count": {"$ne": 0}, "refrigerator_floor": int(floor)}
+            ).sort(
+                [
+                    ("food_count"),
+                ]
+            )
+            foods = list(foods_cursor)
         return jsonify({"result": "success", "foods-list": foods})
     except Exception as e:
         return jsonify({"result": "failure", "msg": str(e)})
@@ -229,7 +256,6 @@ def load_registeration():
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
         return redirect(url_for("index"))
-
     return render_template(
         "registration.html",
         user_info=userinfo,

@@ -76,13 +76,16 @@
 
     <script type="text/javascript">
       const Sort = {
-        // BY_DATE: "recentdate",
+        BY_DATE: "latest",
         BY_EXPIRATION: "expiration",
-        // BY_COUNT: "count"
+        BY_COUNT: "count",
       };
 
       let sortMode = Sort.BY_EXPIRATION;
       let myfridgeMode = false;
+      var floor;
+      var userinfo = "{{user_info['room_number']}}";
+      floor = userinfo.substring(0, 1);
 
       $(document).ready(function () {
         $("#sidebarCollapse").on("click", function () {
@@ -176,15 +179,15 @@
         // 현재 층을 나타내는 버튼의 텍스트 업데이트
         document.querySelector(".alert.alert-primary").textContent =
           floor + "층";
-        showFood(floor);
+        showFood(floor, sortMode);
       }
 
-      function showFood(floor) {
+      function showFood(floor, sortMode) {
         $("#cards-box").empty();
         $.ajax({
           type: "GET",
           url: "/index/list",
-          data: { floor: floor },
+          data: { floor: floor, sortMode: sortMode },
           success: function (response) {
             if (response["result"] != "success") {
               alert(floor + "음식 목록 받아오기 실패");
@@ -197,6 +200,7 @@
       }
       // document.getElementById('current-floor-btn').textContent = floor + '층';
 
+      // 신청하기 함수
       function foodApply(foodId, floor) {
         console.log(foodId);
         $.ajax({
@@ -208,12 +212,36 @@
           success: function (response) {
             if (response["result"] == "success") {
               alert("신청하기 완료!");
-              showFood(floor);
+              showFood(floor, sortMode);
             } else {
               alert("신청하기 실패ㅠㅠ");
             }
           },
         });
+      }
+
+      // 정렬 기준 버튼을 클릭하면 호출됨
+      function changeSorter(newMode) {
+        if (sortMode == newMode) {
+          return;
+        }
+
+        sortMode = newMode;
+        displaySorter();
+        showFood(floor, sortMode);
+      }
+      function displaySorter() {
+        document.getElementById("sorter-latest").classList.remove("active");
+        document.getElementById("sorter-expiration").classList.remove("active");
+        document.getElementById("sorter-count").classList.remove("active");
+
+        if (sortMode == "latest") {
+          document.getElementById("sorter-latest").classList.add("active");
+        } else if (sortMode == "expiration") {
+          document.getElementById("sorter-expiration").classList.add("active");
+        } else if (sortMode == "count") {
+          document.getElementById("sorter-count").classList.add("active");
+        }
       }
     </script>
   </head>
@@ -317,9 +345,34 @@
           <div class="main-contents">
             <div class="tabs">
               <ul>
-                <li class="is-active"><a>최신순</a></li>
-                <li><a>유통기한 낮은순</a></li>
-                <li><a>개수 적은순</a></li>
+                <li>
+                  <a
+                    href="#"
+                    class="btn btn-outline-primary"
+                    id="sorter-latest"
+                    onclick="changeSorter('latest')"
+                    >최신 순</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="btn btn-outline-primary"
+                    id="sorter-expiration"
+                    onclick="changeSorter('expiration')"
+                    >유통기한 빠른 순</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="btn btn-outline-primary"
+                    id="sorter-count"
+                    onclick="changeSorter('count')"
+                    >개수 적은순</a
+                  >
+                </li>
+                <!-- <li><a>개수 적은순</a></li> -->
               </ul>
             </div>
             <p></p>
