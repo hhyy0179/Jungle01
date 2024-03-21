@@ -257,23 +257,36 @@ def load_registeration():
         monthlist = [j for j in range(1, 13)]
         daylist = [k for k in range(1, 32)]
 
+        floors = [i for i in range(1, 23)]
+        roomFloor = int(userinfo.get("room_number", "1")) // 100
+        foods = list(
+            db.refrigerator.find(
+                {"refrigerator_floor": roomFloor, "regi_count": {"$ne": 0}}
+            )
+        )
+
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
         return redirect(url_for("index"))
+    
     return render_template(
         "registration.html",
         user_info=userinfo,
         yearlist=yearlist,
         monthlist=monthlist,
         daylist=daylist,
+        floors=floors,
+        roomFloor=roomFloor,
+        foods=foods
     )
+
 
 
 # 음식 등록하기 api
 @app.route("/registration", methods=["POST"])
 def post_foods():
-    # 클라이언트로부터 데이터를 받기
 
+    # 클라이언트로부터 데이터를 받기
     userId_receive = request.form["userId_give"]
     foodName_receive = request.form["foodname_give"]
 
@@ -299,7 +312,6 @@ def post_foods():
 
     user = db.users.find_one({"user_id": userId_receive})
     new_regi = user["regi_count"] + 1
-
 
     food = {
         "user_id": user["user_id"],
@@ -363,6 +375,7 @@ def apply():
 #마이냉장고 페이지 불러오기
 @app.route("/myfridge")
 def load_myfridge():
+
     token_receive = request.cookies.get("mytoken")
 
     try:
@@ -371,25 +384,39 @@ def load_myfridge():
         )  # token디코딩합니다.
         userinfo = db.users.find_one({"user_id": payload["user_id"]})
 
-        print(userinfo)
-
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
         return redirect(url_for("index"))
-
-    return render_template("myfridge.html", user_info = userinfo)
+    
+    floors = [i for i in range(1, 23)]
+    roomFloor = int(userinfo.get("room_number", "1")) // 100
+    foods = list(
+        db.refrigerator.find(
+            {"refrigerator_floor": roomFloor, "regi_count": {"$ne": 0}}
+        )
+    )
+    
+    return render_template(
+        "myfridge.html",
+        user_info=userinfo,
+        floors=floors,
+        roomFloor=roomFloor,
+        foods=foods,
+    )
 
 
 #개인 포스팅 불러오기
 @app.route('/myfridge/list')
 def show_userpost():
+
     token_receive = request.cookies.get("mytoken")
 
     try:
         payload = jwt.decode(
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
-        userinfos = list(db.refrigerator.find({"user_id": payload["user_id"]}))
+
+        userinfos = list(db.refrigerator.find({"user_id": payload["user_id"],'food_count': {'$gt' : 0}}))
     
     
     except jwt.exceptions.DecodeError:
@@ -399,16 +426,28 @@ def show_userpost():
     return jsonify({'result': 'success', 'user_infos': userinfos})
 
 
-#개인 포스팅 불러오기
+#개인 포스팅 삭제하기
 @app.route('/myfridge/delete', methods=['POST'])
 def delete_userpost():
-    # client 에서 작성한 음식 이름을 가져온다.
+    # client 에서 작성한 음식 아이디값을 가져온다.
     delete_receive = request.form['post_give']
+
+    foodinfo = db.refrigerator.find_one({'_id' : ObjectId(delete_receive)})
+    user = db.users.find_one({'user_id' : foodinfo['user_id']})
     
     result = db.refrigerator.delete_one({'_id' : ObjectId(delete_receive)})
 
+    regi_count = user['regi_count'] - 1
+
+    db.users.update_one({'user_id' : foodinfo['user_id']}, {'$set' : {'regi_count':regi_count}})
+
     if result.deleted_count == 1:
         return jsonify({'result': 'success'})
+
+
+@app.route('/editpost/<food>')
+def show_editpost(food):
+    return render_template("editpost.html", food_data = food)
 
 
 if __name__ == "__main__":
