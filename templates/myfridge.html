@@ -49,6 +49,7 @@
 
     <!-- Our Custom CSS -->
     <!-- <link rel="stylesheet" href="myfridge_style.css"> -->
+
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='myfridge_style.css') }}"
@@ -83,7 +84,6 @@
 
       function showPosts() {
         $("#cards-box").empty();
-
         $.ajax({
           type: "GET",
           url: "/myfridge/list",
@@ -95,23 +95,11 @@
         });
       }
 
-      function EditPost(foodname) {
-        $.ajax({
-          type: "POST",
-          url: "/myfridge/edit",
-          data: { post_give: foodname },
-          success: function (response) {
-            if (response["result"] == "success") {
-            }
-          },
-        });
-      }
-
-      function DeletePost(foodid, user_id) {
+      function DeletePost(foodid) {
         $.ajax({
           type: "POST",
           url: "/myfridge/delete",
-          data: { post_give: foodid, post_user_give: user_id },
+          data: { post_give: foodid },
           success: function (response) {
             if (response["result"] == "success") {
               alert("삭제 완료!");
@@ -121,16 +109,37 @@
         });
       }
 
+      function loadFile(input) {
+        var file = input.files[0]; //선택된 파일 가져오기
+
+        //미리 만들어 놓은 div에 text(파일 이름) 추가
+        var name = document.getElementById("fileName");
+        name.textContent = file.name;
+
+        //새로운 이미지 div 추가
+        var newImage = document.createElement("img");
+        newImage.setAttribute("class", "img");
+
+        //이미지 source 가져오기
+        newImage.src = URL.createObjectURL(file);
+
+        newImage.style.width = "70%";
+        newImage.style.height = "70%";
+        newImage.style.objectFit = "contain";
+
+        //이미지를 image-show div에 추가
+        // var container = document.getElementById('image-show');
+        // container.innerHTML = '';
+        // container.appendChild(newImage);
+      }
+
       function addFoodCards(foods) {
-        for (let i = 1; i < foods.length; i++) {
+        for (let i = 0; i < foods.length; i++) {
           let food = foods[i];
 
           let food_id = food["_id"];
           let food_name = food["food_name"];
           let food_image = food["food_image"];
-
-          console.log(food_id);
-          console.log(food);
 
           let expiration_year = food["expiration_year"];
           let expiration_month = food["expiration_month"];
@@ -153,21 +162,27 @@
                             <p class = "food-name"> 음식 이름: ${food_name}</p>
                             <p class="food-expiration">유통기한: ${expiration_year}.${expiration_month}.${expiration_day}</p>
                             <p class="user-addr">호수: ${room_number}</p>
-    
+                            <p class="food-count">음식 개수: ${food_count}</p>
                             <p class="user-memo">메모: </p>
                             <div class="box" style= "background-color: rgb(211, 246, 255);">
                                 ${memo}
                             </div class="btn-group" style = "display: flex">
-                                <button type="button" class="btn btn-outline-primary" id = "editpost" onclick = "EditPost('${food_id}')">
-                                  수정하기
-                        
-                                  </button>
-                                <button type="button" class="btn btn-outline-primary" id="deletepost" onclick="DeletePost('${food_id}', '${user_id}')">삭제하기</button>
+                               
+                                <button type="button" class="btn btn-outline-primary" id = "deletepost" onclick = "DeletePost('${food_id}' )">삭제하기</button>
                             </div>
                     </div>
                 `;
           $("#cards-box").append(cardContentHtml);
         }
+      }
+
+      function changeFloorText(element) {
+        // 클릭된 요소에서 data-floor 속성 값 가져오기
+        floor = element.getAttribute("data-floor");
+        // 현재 층을 나타내는 버튼의 텍스트 업데이트
+        document.querySelector(".alert.alert-primary").textContent =
+          floor + "층";
+        showFood(floor, sortMode);
       }
     </script>
   </head>
@@ -180,31 +195,18 @@
           <h3>모두의 냉장고</h3>
         </div>
         <ul class="list-unstyled components">
-          <p>층별 선택</p>
-          <li>
-            <a href="#">1층</a>
-          </li>
-          <li>
-            <a href="#">2층</a>
-          </li>
-          <li>
-            <a href="#">3층</a>
-          </li>
-          <li>
-            <a href="#">4층</a>
-          </li>
-          <li>
-            <a href="#">5층</a>
-          </li>
-          <li>
-            <a href="#">6층</a>
-          </li>
-          <li>
-            <a href="#">7층</a>
-          </li>
-          <li>
-            <a href="#">8층</a>
-          </li>
+          <div>
+            {% for floor in floors %}
+            <li>
+              <a
+                href="#"
+                data-floor="{{ floor }}"
+                onclick="changeFloorText(this);"
+                >{{ floor }}층</a
+              >
+            </li>
+            {% endfor %}
+          </div>
         </ul>
       </nav>
 
@@ -217,19 +219,41 @@
               <span></span>
             </button>
 
-            <button type="button" class="btn btn-outline-primary">
-              모두의 냉장고
-            </button>
-
-            <button type="button" class="btn btn-outline-primary">
-              마이페이지
-            </button>
+            <a href="index">
+              <p class="title-top">모두의 냉장고</p>
+            </a>
+            <div
+              class="alert alert-primary"
+              role="alert"
+              id="current-floor-btn"
+              style="width: 120px; text-align: center"
+            >
+              마이냉장고
+            </div>
           </div>
         </nav>
 
         <div class="wrap-main">
-          <div class="wrap-user-info">
+          <div
+            class="wrap-user-info"
+            style="display: flex; justify-content: flex-start; text-align: left"
+          >
             <label class="imgbtn" for="chooseFile"></label>
+            <input
+              type="file"
+              id="chooseFile"
+              name="chooseFile"
+              accept="image/*"
+              onchange="loadFile(this)"
+              style="width: 50px"
+            />
+            <div
+              class="user-defaul-info"
+              style="font-size: larger; font-weight: 700; margin-top: 10px"
+            >
+              <p class="user-name">사용자 이름: {{ user_info.name }}</p>
+              <p class="user-floor">호 수: {{ user_info.room_number }} 호</p>
+            </div>
           </div>
 
           <div class="wrap-check-registration">

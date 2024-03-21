@@ -35,7 +35,7 @@
         crossorigin="anonymous"></script>
 
      <!-- Our Custom CSS -->
-     <link rel="stylesheet" href="{{ url_for('static', filename='registration_style.css') }}">
+     <link rel="stylesheet" href="{{ url_for('static', filename='edit_style.css') }}">
     
 
     <!-- Font Awesome JS -->
@@ -55,7 +55,7 @@
 
     <script type="text/javascript">
 
-        var selectedYear, selectedMonth, selectedDay;
+        let selectedYear, selectedMonth, selectedDay;
 
         $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
@@ -82,6 +82,13 @@
                 console.log(daySelect.value)
                 selectedDay = daySelect.value;
             });
+
+            var dd = location.href.substr(
+                location.href.lastIndexOf('=')+1
+            );
+
+            console.log('dd : ',dd);
+
         });
 
         var newImage;
@@ -109,12 +116,8 @@
             container.appendChild(newImage);
         };
 
-        function BackIndex() {
-            window.location.href = "/index";
-        }
-
         function PostFoodInfo() {
-            var user_info =  JSON.parse('{{ user_info | tojson | safe }}');
+            var food_info =  JSON.parse('{{ food_info | tojson | safe }}');
             let userid = user_info.user_id;
             let foodname = $('#food_inputname').val()
             let foodcount = $('#food_inputcount').val()
@@ -151,11 +154,11 @@
                 processData: false,
                 success: function (response) {
                     if(response["result"] == 'success')  {
-                        window.location.href = "/index"
-                        alert('등록 완료!')
+                        window.location.href = "/myfridge"
+                        alert('수정 완료!')
                     }
                     else {
-                        alert('등록 실패!')
+                        alert('수정 실패!')
                     }
                 }
             })
@@ -173,18 +176,33 @@
                 <h3>모두의 냉장고</h3>
             </div>
             <ul class="list-unstyled components">
-                <div>
-                    {% for floor in floors %}
-                    <li>
-                    <a
-                        href="#"
-                        data-floor="{{ floor }}"
-                        onclick="changeFloorText(this);"
-                        >{{ floor }}층</a
-                    >
-                    </li>
-                    {% endfor %}
-                </div>
+                <p>
+                    층별 선택
+                </p>
+                <li>
+                    <a href="#">1층</a>
+                </li>
+                <li>
+                    <a href="#">2층</a>
+                </li>
+                <li>
+                    <a href="#">3층</a>
+                </li>
+                <li>
+                    <a href="#">4층</a>
+                </li>
+                <li>
+                    <a href="#">5층</a>
+                </li>
+                <li>
+                    <a href="#">6층</a>
+                </li>
+                <li>
+                    <a href="#">7층</a>
+                </li>
+                <li>
+                    <a href="#">8층</a>
+                </li>
             </ul>
         </nav>
 
@@ -197,11 +215,11 @@
                         <span></span>
                         <span></span>
                     </button>
-                    <a href = "index">
-                        <p class = "title-top" > 모두의 냉장고</p>
-                    </a>
+
+                    <p class = "title-top" > 모두의 냉장고</p>
+
                     <div class="alert alert-primary" role="alert" id="current-floor-btn" style="width: 110px; text-align: center;">
-                        등록하기
+                        수정하기
                     </div>
                 </div>
             </nav>
@@ -229,21 +247,20 @@
                                 <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)">
                             </form>
                         </div>
-                        
-                        <div class="image-show" id="image-show"></div>
-                
+                        <div class="image-show" id="image-show"> 
+                            
+                        </div>
                     </div>
                 </p>
                 <p>
                     <div class = "food_inputname"  style="margin-bottom: 30px;" >
-                        음식 이름: <input type="text" id = "food_inputname" style="margin-left: 30px;" />
+                        음식 이름: <input type="text" id = "food_inputname" style="margin-left: 30px;" value = "{{food_info.food_name }} "/>
                     </div>
                 </p>
                 <p>
                     <div class = "food_inputcount"  style="margin-bottom: 30px;" >
                         수량: <input type="text" id = "food_inputcount" style="margin-left: 30px; width: 50px; margin-right: 10px;" />
                         개
-
                     </div>
                 </p>
                 <p>
@@ -254,9 +271,13 @@
                                 <div class="select is-info is-rounded is-small">
                                     <select id = "yearSelect">
                                         {% for year in yearlist %}
-                                            <option> {{ year }} </option>
+                                            {% if year == food_info.expiration_year %}
+                                                <option selected>{{ year }}</option>
+                                            {% else %}
+                                                <option>{{ year }}</option>
+                                            {% endif %}
+                                           
                                         {% endfor %}           
-                                    
                                     </select>
                                 </div>
                                 년
@@ -269,7 +290,6 @@
                                         {% endfor %}           
                                     </select>
                                 </div>
-                                
                                 월
                             </div>
                             <div class = "select-day" style="margin-left: 20px;">
@@ -293,8 +313,8 @@
                 </p>
 
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button class="btn btn-btn btn-secondary" type="button" style = "margin-right: 30px;" onclick="BackIndex()">취소하기</button>
-                    <button class="btn btn-primary me-md-2" type="button" onclick = "PostFoodInfo()">등록하기</button>
+                    <button class="btn btn-btn btn-secondary" type="button" style = "margin-right: 30px;">취소하기</button>
+                    <button class="btn btn-primary me-md-2" type="button" onclick = "PostFoodInfo()">수정하기</button>
                 </div>
             
             </div>

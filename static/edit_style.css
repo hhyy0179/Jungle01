@@ -65,6 +65,9 @@ a, a:hover, a:focus {
     color: #fff;
     transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
     transform-origin: bottom left;
+    height: auto;
+    overflow-y: auto;    /* 세로 스크롤 가능 */
+    border-radius: 10px;
 }
 
 #sidebar.active {
@@ -92,7 +95,6 @@ a, a:hover, a:focus {
     font-size: 1.1em;
     display: block;
 }
-
 #sidebar ul li a:hover {
     color: #7386D5;
     background: #fff;
@@ -234,26 +236,27 @@ a.article, a.article:hover {
     color: rgb(97, 248, 105) !important;
 }
 
-.wrap-main {
-    width: 900px;
-    margin: 50px auto;
+
+.title-top {
+    font-weight: 700;
+    font-size: xx-large;
 }
 
-.wrap-user-info {
+.hello-user {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.user-contents h3 {
+    font-weight: 700;
+    color: rgb(48, 89, 252);
+    margin-bottom: 20px;
+}
+.wrap-main {
     width: 700px;
     margin: 30px auto;
-}
-
-.wrap-check-registration {
-    width: 900px;
-    margin-top: 60px;
-    border: 2px solid rgb(47, 77, 183);
-    border-radius: 50px;
-}
-
-.check-contents {
-    margin: 30px;
-    font-weight: 500;
+    padding: 30px;
 }
 
 .button {
@@ -266,54 +269,11 @@ label {
     font-size: 1em;
 }
 
-.circle-box {
-    width: 100px;
-    height: 100px; 
-    border-radius: 70%;
-    overflow: hidden;
-}
-
-.profile {
-    width: 200%;
-    height: 200%;
-    object-fit: cover;
-}
-
+/* 못생긴 기존 input 숨기기 */
 #chooseFile {
     visibility: hidden;
 }
 
-hr {
-    color:#2e3f84;
-}
-
-.wrap img {
-    display: hidden;;
-    width:100px;
-    height:100px;
-}
-
-.wrap {
-    border-radius: 50%;
-    overflow: hidden;
-    width:100px;
-    height:100px;
-    border:2px solid black;
-    position: absolute;
-    top: 130px;
-    display: hidden;
-}
-
-.imgbtn {
-    background-image: url("https://mblogthumb-phinf.pstatic.net/MjAyMDEyMjBfMjU4/MDAxNjA4NDUxOTk3Mjk2.W88f9Phe4d6mo48vpWuZQ9e9R4CvARFvZEoBW9irbXYg.UWAbicHtrZc1hrgYt38Fp79LOnbMhQ6_hcttqmEu79gg.JPEG.goodmanddo/%EC%9B%83%EA%B8%B4_%EC%B9%B4%ED%86%A1%ED%94%84%EC%82%AC_%EA%B8%B0%EB%B3%B8.jpg?type=w800");
-    background-size: cover;
-    border-radius: 50%;
-    width:100px;
-    height:100px;
-    border:2px solid black;
-}
-
-.title-top {
-    font-weight: 700;
-    font-size: xx-large;
+.food_inputmemo {
+    width: 400px;
 }
