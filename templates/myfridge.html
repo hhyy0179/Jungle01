@@ -49,6 +49,7 @@
 
     <!-- Our Custom CSS -->
     <!-- <link rel="stylesheet" href="myfridge_style.css"> -->
+    
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='myfridge_style.css') }}"
@@ -72,10 +73,13 @@
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
 
     <script type="text/javascript">
+
       $(document).ready(function () {
-        $("#sidebarCollapse").on("click", function () {
-          $("#sidebar").toggleClass("active");
-          $(this).toggleClass("active");
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+                $(this).toggleClass('active');
+            });
+
         });
 
         function showPosts() {
@@ -91,18 +95,7 @@
             })
         }
 
-        // function EditPost(foodid) {
-        //     $.ajax({
-        //         type: "GET",
-        //         url: "/editpost",
-        //         data: {foodid_give : foodid},
-        //         success: function (response) {
-                    
-        //         }
-        //     });
-        // }
 
-    
         function DeletePost(foodid) {
             $.ajax({
                 type: "POST",
@@ -221,23 +214,26 @@
             </ul>
         </nav>
 
-        <div class="wrap-main">
-          <div class="wrap-user-info">
-            <label class="imgbtn" for="chooseFile"></label>
-          </div>
-
+        <div id = "content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="navbar-btn">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+    
                     <a href = "index">
                         <p class = "title-top" > 모두의 냉장고</p>
                     </a>
                     <div class="alert alert-primary" role="alert" id="current-floor-btn" style="width: 120px; text-align: center;">
                         마이냉장고
                     </div>
-
+    
                 </div>
             </nav>
-
-            <div class = "wrap-main">
     
+            <div class = "wrap-main">
                 <div class="wrap-user-info" style="display: flex;justify-content: flex-start;text-align: left;">
                     <label class = "imgbtn" for="chooseFile"></label>
                     <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)" style = "width : 50px">
@@ -245,7 +241,7 @@
                         <p class = "user-name"> 사용자 이름: {{ user_info.name }} </p>
                         <p class = "user-floor"> 호 수: {{ user_info.room_number }} 호 </p>
                     </div>
-                   
+                    
                 </div>
                 
                 <div class = "wrap-check-registration" >
@@ -255,10 +251,7 @@
                     </div>
                 </div>
             </div>
-        
-            
         </div>
-      </div>
     </div>
   </body>
 </html>
