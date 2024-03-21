@@ -305,3 +305,14 @@ a.article, a.article:hover {
     width:100px;
     height:50px;
 }
+
+.card-img-top {
+    height: 200px; /* 고정된 높이 */
+    object-fit: cover; /* 이미지 비율 유지하며 덮기 */
+}
+
+.card-body {
+    height: 250px; /* 본문 높이 고정 */
+    overflow: auto; /* 내용이 넘칠 경우 스크롤 생성 */
+}
+  
