@@ -24,7 +24,7 @@ app.secret_key = "your_very_secret_and_complex_key_here"
 from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
-#client = MongoClient('mongodb://test:test@13.125.17.72',27017)
+# client = MongoClient('mongodb://test:test@13.125.17.72',27017)
 # client = MongoClient("mongodb://test:test@43.200.173.147", 27017)
 db = client.dbrefrigerator
 
@@ -33,6 +33,7 @@ db = client.dbrefrigerator
 # ObjectId 타입으로 되어있는 _id 필드는 Flask 의 jsonify 호출시 문제가 된다.
 # 이를 처리하기 위해서 기본 JsonEncoder 가 아닌 custom encoder 를 사용한다.
 # Custom encoder 는 다른 부분은 모두 기본 encoder 에 동작을 위임하고 ObjectId 타입만 직접 처리한다.
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -300,7 +301,6 @@ def post_foods():
     user = db.users.find_one({"user_id": userId_receive})
     new_regi = user["regi_count"] + 1
 
-
     food = {
         "user_id": user["user_id"],
         "pwd": user["pwd"],
@@ -360,7 +360,7 @@ def apply():
             return jsonify({"result": "failure"})
 
 
-#마이냉장고 페이지 불러오기
+# 마이냉장고 페이지 불러오기
 @app.route("/myfridge")
 def load_myfridge():
     token_receive = request.cookies.get("mytoken")
@@ -377,11 +377,11 @@ def load_myfridge():
         flash("로그인 정보가 존재하지 않습니다.")
         return redirect(url_for("index"))
 
-    return render_template("myfridge.html", user_info = userinfo)
+    return render_template("myfridge.html", user_info=userinfo)
 
 
-#개인 포스팅 불러오기
-@app.route('/myfridge/list')
+# 개인 포스팅 불러오기
+@app.route("/myfridge/list")
 def show_userpost():
     token_receive = request.cookies.get("mytoken")
 
@@ -390,25 +390,29 @@ def show_userpost():
             token_receive, SECRET_KEY, algorithms=["HS256"]
         )  # token디코딩합니다.
         userinfos = list(db.refrigerator.find({"user_id": payload["user_id"]}))
-    
-    
+
     except jwt.exceptions.DecodeError:
         flash("로그인 정보가 존재하지 않습니다.")
         return redirect(url_for("index"))
 
-    return jsonify({'result': 'success', 'user_infos': userinfos})
+    return jsonify({"result": "success", "user_infos": userinfos})
 
 
-#개인 포스팅 불러오기
-@app.route('/myfridge/delete', methods=['POST'])
+# 개인 포스팅 불러오기
+@app.route("/myfridge/delete", methods=["POST"])
 def delete_userpost():
     # client 에서 작성한 음식 이름을 가져온다.
-    delete_receive = request.form['post_give']
-    
-    result = db.refrigerator.delete_one({'_id' : ObjectId(delete_receive)})
+    delete_receive = request.form["post_give"]
+    user_receive = request.form["post_user_give"]
+    print(user_receive)
+    user = db.users.find_one({"user_id": user_receive})
+    new_regi = user["regi_count"] - 1
+
+    result = db.refrigerator.delete_one({"_id": ObjectId(delete_receive)})
+    db.users.update_one({"user_id": user_receive}, {"$set": {"regi_count": new_regi}})
 
     if result.deleted_count == 1:
-        return jsonify({'result': 'success'})
+        return jsonify({"result": "success"})
 
 
 if __name__ == "__main__":

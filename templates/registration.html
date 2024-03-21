@@ -106,6 +106,10 @@
             container.appendChild(newImage);
         };
 
+        function BackIndex() {
+            window.location.href = "/index";
+        }
+
         function PostFoodInfo() {
             var user_info =  JSON.parse('{{ user_info | tojson | safe }}');
             let userid = user_info.user_id;
@@ -301,7 +305,7 @@
                 </p>
 
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button class="btn btn-btn btn-secondary" type="button" style = "margin-right: 30px;">취소하기</button>
+                    <button class="btn btn-btn btn-secondary" type="button" style = "margin-right: 30px;" onclick="BackIndex()">취소하기</button>
                     <button class="btn btn-primary me-md-2" type="button" onclick = "PostFoodInfo()">등록하기</button>
                 </div>
             
