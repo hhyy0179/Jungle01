@@ -4,6 +4,7 @@ from flask.json.provider import JSONProvider
 
 from flask import (
     Flask,
+    abort,
     flash,
     make_response,
     render_template,
@@ -24,6 +25,7 @@ app.secret_key = "your_very_secret_and_complex_key_here"
 from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
+# client = MongoClient('mongodb://test:test@13.125.17.72',27017)
 # client = MongoClient('mongodb://test:test@13.125.17.72',27017)
 # client = MongoClient("mongodb://test:test@43.200.173.147", 27017)
 db = client.dbrefrigerator
@@ -334,7 +336,13 @@ def post_foods():
 @app.route("/api/apply", methods=["POST"])
 def apply():
     apply_foodid_receive = request.form["apply_foodid_give"]
+
     food = db.refrigerator.find_one({"_id": ObjectId(apply_foodid_receive)})
+
+    print(food)
+    if food is None:
+        abort(404, description="Requested product not found")
+
     print("현재 음식 개수", food["food_count"])
 
     new_food_count = food["food_count"] - 1
@@ -403,13 +411,8 @@ def show_userpost():
 def delete_userpost():
     # client 에서 작성한 음식 이름을 가져온다.
     delete_receive = request.form["post_give"]
-    user_receive = request.form["post_user_give"]
-    print(user_receive)
-    user = db.users.find_one({"user_id": user_receive})
-    new_regi = user["regi_count"] - 1
 
     result = db.refrigerator.delete_one({"_id": ObjectId(delete_receive)})
-    db.users.update_one({"user_id": user_receive}, {"$set": {"regi_count": new_regi}})
 
     if result.deleted_count == 1:
         return jsonify({"result": "success"})

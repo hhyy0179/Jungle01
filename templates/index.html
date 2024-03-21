@@ -241,8 +241,14 @@
             if (response["result"] == "success") {
               alert("신청하기 완료!");
               showFood(floor, sortMode);
+            }
+          },
+          error: function (xhr, status, error) {
+            if (xhr.status == 404) {
+              alert("음식이 모두 소진되어 신청에 실패했습니다.");
+              showFood(floor, sortMode);
             } else {
-              alert("신청하기 실패ㅠㅠ");
+              alert("서버 오류 발생: " + error);
             }
           },
         });
