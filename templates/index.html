@@ -105,7 +105,7 @@
           },
         });
       }
-      
+
       // window.onload = () => {
       //     const token = localStorage.getItem('mytoken');
       //     if (!token) {
@@ -206,7 +206,7 @@
           url: "/myfridge",
           success: function (response) {
             window.location.href = "/myfridge";
-          }
+          },
         });
       }
 
@@ -216,7 +216,7 @@
           url: "/registration",
           success: function (response) {
             window.location.href = "/registration";
-          }
+          },
         });
       }
 
@@ -235,8 +235,14 @@
             if (response["result"] == "success") {
               alert("신청하기 완료!");
               showFood(floor, sortMode);
+            }
+          },
+          error: function (xhr, status, error) {
+            if (xhr.status == 404) {
+              alert("음식이 모두 소진되어 신청에 실패했습니다.");
+              showFood(floor, sortMode);
             } else {
-              alert("신청하기 실패ㅠㅠ");
+              alert("서버 오류 발생: " + error);
             }
           },
         });
@@ -315,10 +321,10 @@
               class="alert alert-primary"
               role="alert"
               id="current-floor-btn"
-              style="width: 80px; text-align: center">
+              style="width: 80px; text-align: center"
+            >
               {{ roomFloor }}층
             </div>
-            
           </div>
         </nav>
 
@@ -352,18 +358,25 @@
               class="btn btn-primary"
               id="registration_btn"
               onclick="LoadRegistration()"
-              >등록하기</button>
-              <div>
-                <button
-                  type="button"
-                  class="btn btn-danger alert-danger"
-                  id="logout-btn"
-                  style="width:70px; text-align: center; margin-top: 20px; font-size: small;"
-                  onclick="logout()"
-                >
-                  logout
-                </button>
-              </div>
+            >
+              등록하기
+            </button>
+            <div>
+              <button
+                type="button"
+                class="btn btn-danger alert-danger"
+                id="logout-btn"
+                style="
+                  width: 70px;
+                  text-align: center;
+                  margin-top: 20px;
+                  font-size: small;
+                "
+                onclick="logout()"
+              >
+                logout
+              </button>
+            </div>
           </div>
           <div class="main-contents">
             <div class="tabs">
