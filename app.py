@@ -24,10 +24,9 @@ app.secret_key = "your_very_secret_and_complex_key_here"
 
 from pymongo import MongoClient
 
-client = MongoClient("localhost", 27017)
-# client = MongoClient('mongodb://test:test@13.125.17.72',27017)
-# client = MongoClient('mongodb://test:test@13.125.17.72',27017)
-# client = MongoClient("mongodb://test:test@43.200.173.147", 27017)
+# client = MongoClient("localhost", 27017)
+client = MongoClient("mongodb://admin:test@3.38.103.80", 27017)
+
 db = client.dbrefrigerator
 
 
@@ -129,9 +128,9 @@ def api_login():
             "user_id": id_recieve,
             "exp": datetime.now(timezone.utc) + timedelta(hours=24),
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+        # token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
         # 배포할땐 바꾸기
-        # token = jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("UTF-8")
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("UTF-8")
         return jsonify({"result": "success", "token": token})
     else:
         return jsonify({"result": "fail", "msg": "아이디 또는 비밀번호가 틀렸습니다."})
@@ -366,6 +365,14 @@ def apply():
             return jsonify({"result": "success"})
         else:
             return jsonify({"result": "failure"})
+
+
+# 수정하기 페이지로 이동
+@app.route("/modify")
+def move_modify():
+    food_id = request.args.get("food_id")
+    print("수정하기 이동완료")
+    return render_template("edit.html")
 
 
 # 마이냉장고 페이지 불러오기
