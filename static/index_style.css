@@ -307,6 +307,16 @@ a.article:hover {
 .list-unstyled components li {
   text-align: center;
 }
+#cards-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.card {
+    flex: 1 0 200px; /* 카드의 기본 크기를 설정하고, 유연하게 늘어날 수 있게 합니다. */
+    max-width: 255px;
+  }
 
 .card-img-top {
   height: 150px; /* 고정된 높이 */
