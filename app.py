@@ -26,6 +26,7 @@ from pymongo import MongoClient
 
 client = MongoClient("localhost", 27017)
 # client = MongoClient('mongodb://test:test@13.125.17.72',27017)
+# client = MongoClient('mongodb://test:test@13.125.17.72',27017)
 # client = MongoClient("mongodb://test:test@43.200.173.147", 27017)
 db = client.dbrefrigerator
 

@@ -307,3 +307,13 @@ a.article:hover {
 .list-unstyled components li {
   text-align: center;
 }
+
+.card-img-top {
+  height: 150px; /* 고정된 높이 */
+  object-fit: contain; /* 이미지 비율 유지하며 덮기 */
+}
+
+.card-body {
+  height: 350px; /* 본문 높이 고정 */
+  overflow: auto; /* 내용이 넘칠 경우 스크롤 생성 */
+}
